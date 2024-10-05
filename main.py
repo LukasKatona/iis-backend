@@ -90,6 +90,6 @@ app.add_middleware(
 # DELETE THESE BLOCK ^
 
 @app.get("/product-categories")
-def get_product_categories() -> list[ProductCategory]:
+def get_product_categories() -> dict[str, list[ProductCategory]]:
     with Session() as session:
-        return session.query(ProductCategory).all()
+        return {"productCategories": session.query(ProductCategory).all()}
