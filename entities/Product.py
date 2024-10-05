@@ -11,6 +11,7 @@ Base = declarative_base()
 # Models for Pydanitc
 
 class ProductModel(BaseModel):
+    id: int
     name: str
     imageUrl: str
     unit: Unit
@@ -22,6 +23,7 @@ class ProductModel(BaseModel):
         from_attributes = True
 
 class ProductCategoryModel(BaseModel):
+    id: int
     name: str
     parentCategoryId: int | None = None
 
@@ -43,6 +45,7 @@ class ProductORM(Base):
 
     def create_model(self) -> ProductModel:
         return ProductModel(
+            id=self.id,
             name=self.name,
             imageUrl=self.imageUrl,
             unit=self.unit,
@@ -61,6 +64,7 @@ class ProductCategoryORM(Base):
 
     def create_model(self) -> ProductCategoryModel:
         return ProductCategoryModel(
+            id=self.id,
             name=self.name,
             parentCategoryId=self.parentCategoryId)
 
