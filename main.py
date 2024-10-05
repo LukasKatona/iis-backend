@@ -9,7 +9,7 @@ import sqlalchemy as sa
 from sqlalchemy import URL
 
 # local imports
-from entities.Product import Product, ProductCategory
+from entities.Product import ProductCategoryModel, ProductCategoryORM
 
 connection_string = URL.create(
     'postgresql',
@@ -90,6 +90,16 @@ app.add_middleware(
 # DELETE THESE BLOCK ^
 
 @app.get("/product-categories")
-def get_product_categories() -> dict[str, list[ProductCategory]]:
+def get_product_categories() -> list[ProductCategoryModel]:
     with Session() as session:
-        return {"productCategories": session.query(ProductCategory).all()}
+        categoryORMs = session.query(ProductCategoryORM).all()
+        list = []
+        for categoryORM in categoryORMs:
+            list.append(categoryORM.create_model())
+        return list
+    
+@app.get("/product-categories/{category_id}")
+def get_product_category_by_id(category_id: int) -> ProductCategoryModel:
+    with Session() as session:
+        categoryORM = session.query(ProductCategoryORM).filter(ProductCategoryORM.id == category_id).first()
+        return categoryORM.create_model()

@@ -1,6 +1,6 @@
 import sqlalchemy as sa
 from sqlalchemy import URL
-from entities.Product import ProductCategory, Product
+from entities.Product import ProductCategoryORM, ProductORM
 
 connection_string = URL.create(
     'postgresql',
@@ -16,14 +16,14 @@ Base = sa.orm.declarative_base()
 
 def main() -> None:
     print("Dropping tables")
-    Product.metadata.drop_all(db)
-    ProductCategory.metadata.drop_all(db)
+    ProductORM.metadata.drop_all(db)
+    ProductCategoryORM.metadata.drop_all(db)
     print("Creating tables")
-    Product.metadata.create_all(db)
-    ProductCategory.metadata.create_all(db)
+    ProductORM.metadata.create_all(db)
+    ProductCategoryORM.metadata.create_all(db)
     print("Inserting demo data")
-    vegetables = ProductCategory(name="Vegetables")
-    fruits = ProductCategory(name="Fruits")
+    vegetables = ProductCategoryORM(name="Vegetables")
+    fruits = ProductCategoryORM(name="Fruits")
 
     with Session() as session:
         session.add_all([vegetables, fruits])
