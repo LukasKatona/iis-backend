@@ -1,72 +1,32 @@
 # library imports
+from typing import Optional
 import sqlalchemy as sa
-from sqlalchemy.orm import Mapped, mapped_column, declarative_base, relationship
 from pydantic import BaseModel
+from sqlmodel import Field, SQLModel, Relationship
 
 # local imports
 from enums.Unit import Unit
 
-Base = declarative_base()
-
-# Models for Pydanitc
-
-class ProductModel(BaseModel):
-    id: int
+class Product(SQLModel, table=True):
+    __tablename__ = 'products'
+    id: int = Field(default=None, primary_key=True)
     name: str
     imageUrl: str
     unit: Unit
     unitPrice: float
     stock: int
-    categoryId: int
+    categoryId : int = Field(default=None, foreign_key="product_categories.id", index=True, nullable=True)
 
-    class Config:
-        from_attributes = True
-
-class ProductCategoryModel(BaseModel):
-    id: int
-    name: str
-    parentCategoryId: int | None = None
-
-    class Config:
-        from_attributes = True
-
-# Models for SQLAlchemy
-
-class ProductORM(Base):
-    __tablename__ = 'products'
-
-    id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str]
-    imageUrl: Mapped[str]
-    unit: Mapped[Unit]
-    unitPrice: Mapped[float]
-    stock: Mapped[int]
-    categoryId: Mapped[int] = mapped_column(sa.Integer, sa.ForeignKey("product_categories.id"), index=True)
-
-    def create_model(self) -> ProductModel:
-        return ProductModel(
-            id=self.id,
-            name=self.name,
-            imageUrl=self.imageUrl,
-            unit=self.unit,
-            unitPrice=self.unitPrice,
-            stock=self.stock,
-            categoryId=self.categoryId)
-
-class ProductCategoryORM(Base):
+class ProductCategory(SQLModel, table=True):
     __tablename__ = 'product_categories'
+    id: int = Field(default=None, primary_key=True)
+    name: str
+    parentCategoryId: int = Field(default=None, foreign_key="product_categories.id", nullable=True)
 
-    id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str]
-    parentCategoryId: Mapped[int] = mapped_column(sa.Integer, sa.ForeignKey("product_categories.id"), nullable=True)
-    parentCategory: Mapped["ProductCategoryORM"] = relationship("ProductCategoryORM", back_populates="childCategories", remote_side="ProductCategoryORM.id")
-    childCategories: Mapped[list["ProductCategoryORM"]] = relationship("ProductCategoryORM", back_populates="parentCategory")
+    parentCategory: Optional["ProductCategory"] = Relationship(back_populates="childCategories", sa_relationship_kwargs={"remote_side": "ProductCategory.id"})
+    childCategories: list["ProductCategory"] = Relationship(back_populates="parentCategory")
 
-    def create_model(self) -> ProductCategoryModel:
-        return ProductCategoryModel(
-            id=self.id,
-            name=self.name,
-            parentCategoryId=self.parentCategoryId)
+# relationships
 
-ProductORM.category = relationship("ProductCategoryORM", back_populates="products")
-ProductCategoryORM.products = relationship("ProductORM", back_populates="category")
+Product.category = Relationship(back_populates="products")
+ProductCategory.products = Relationship(back_populates="category")
