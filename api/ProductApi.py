@@ -1,24 +1,17 @@
 # library imports
 from typing import Optional
 from fastapi import APIRouter, Query
-from sqlalchemy import and_
+from sqlalchemy import and_, or_
 from sqlmodel import Session, create_engine, select
 
 # local imports
+from entities.ProductCategory import ProductCategory
 from entities.Product import Product
 from constants.databaseURL import DATABASE_URL
 
 router = APIRouter()
 
 db = create_engine(DATABASE_URL)
-
-#     id: int
-#     name: str
-#     imageUrl: str
-#     unit: Unit
-#     unitPrice: float
-#     stock: int
-#     categoryId: int
 
 @router.get("/products")
 def get_products(
@@ -36,7 +29,7 @@ def get_products(
             if nameFilter:
                 filters.append(Product.name == nameFilter)
             if categoryIdFilter:
-                filters.append(Product.categoryId == categoryIdFilter)
+                filters.append(Product.categoryId.in_(get_subcategory_ids(session, categoryIdFilter)))
             query = query.where(and_(*filters))
         
         # apply sorting
@@ -47,6 +40,18 @@ def get_products(
                 query = query.order_by(sortField.desc())
             
         return session.exec(query).all()
+
+def get_subcategory_ids(session, category_id):
+    subcategory_ids = [category_id]
+    
+    subcategories = session.exec(
+        select(ProductCategory).where(ProductCategory.parentCategoryId == category_id)
+    ).all()
+
+    for subcategory in subcategories:
+        subcategory_ids.extend(get_subcategory_ids(session, subcategory.id))
+    
+    return subcategory_ids
 
     
 @router.get("/products/{product_id}")

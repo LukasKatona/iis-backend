@@ -1,6 +1,5 @@
 # library imports
-from typing import Optional
-from sqlmodel import Field, SQLModel, Relationship
+from sqlmodel import Field, SQLModel
 
 # local imports
 from enums.Unit import Unit
