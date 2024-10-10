@@ -1,7 +1,11 @@
+# library imports
 import sqlalchemy as sa
 from sqlalchemy import URL
+
+# local imports
 from entities.Product import Product
 from entities.ProductCategory import ProductCategory
+from enums.Unit import Unit
 
 connection_string = URL.create(
     'postgresql',
@@ -69,10 +73,21 @@ def main() -> None:
 
         print("Inserting products")
         session.add_all([
-            Product(name="Spinach", imageUrl="https://images.unsplash.com/photo-1601750624501-0b1b0b1b1b1b", unit="kg", unitPrice=2.5, stock=100, categoryId=session.query(ProductCategory).filter_by(name="Spinach").first().id),
-            Product(name="Kale", imageUrl="https://images.unsplash.com/photo-1601750624501-0b1b0b1b1b1b", unit="kg", unitPrice=3.5, stock=100, categoryId=session.query(ProductCategory).filter_by(name="Kale").first().id),
-            Product(name="Carrot", imageUrl="https://images.unsplash.com/photo-1601750624501-0b1b0b1b1b1b", unit="kg", unitPrice=1.5, stock=100, categoryId=session.query(ProductCategory).filter_by(name="Carrot").first().id),
+            Product(name="Spinach", imageUrl="https://unsplash.com/photos/a-bunch-of-green-leaves-with-drops-of-water-on-them-Um2DgUUxIn4", unit=Unit.KILOGRAM, unitPrice=2.5, stock=100, categoryId=session.query(ProductCategory).filter_by(name="Spinach").first().id),
+            Product(name="Kale", imageUrl="https://unsplash.com/photos/a-bunch-of-green-leafy-vegetables-with-drops-of-water-on-them-fQcn2rbmkIA", unit=Unit.KILOGRAM, unitPrice=3.5, stock=100, categoryId=session.query(ProductCategory).filter_by(name="Kale").first().id),
+            Product(name="Carrot", imageUrl="https://unsplash.com/photos/carrots-on-table-eFFnKMiDMGc", unit=Unit.PIECE, unitPrice=1.5, stock=100, categoryId=session.query(ProductCategory).filter_by(name="Carrot").first().id),
+            Product(name="Beetroot", imageUrl="https://unsplash.com/photos/onion-on-white-plate-TmjyLCUpcDY", unit=Unit.PIECE, unitPrice=1.8, stock=100, categoryId=session.query(ProductCategory).filter_by(name="Beetroot").first().id),
+            Product(name="Peas", imageUrl="https://unsplash.com/photos/a-pink-plate-filled-with-green-beans-and-peas-hf0esLbFAMA", unit=Unit.KILOGRAM, unitPrice=4.0, stock=50, categoryId=session.query(ProductCategory).filter_by(name="Peas").first().id),
+            Product(name="Beans", imageUrl="https://unsplash.com/photos/a-pile-of-red-beans-sitting-next-to-each-other-dU9CwN0CD6I", unit=Unit.KILOGRAM, unitPrice=3.8, stock=60, categoryId=session.query(ProductCategory).filter_by(name="Beans").first().id),
+            Product(name="Orange", imageUrl="https://unsplash.com/photos/orange-fruit-in-brown-basket-QI5nFAUXWvM", unit=Unit.PIECE, unitPrice=0.9, stock=200, categoryId=session.query(ProductCategory).filter_by(name="Orange").first().id),
+            Product(name="Lemon", imageUrl="https://unsplash.com/photos/bunch-of-lemons-on-wooden-rack-7woHBtwCgTQ", unit=Unit.PIECE, unitPrice=0.5, stock=150, categoryId=session.query(ProductCategory).filter_by(name="Lemon").first().id),
+            Product(name="Strawberry", imageUrl="https://unsplash.com/photos/red-raspberries-IeEFsajuORc", unit=Unit.KILOGRAM, unitPrice=6.0, stock=40, categoryId=session.query(ProductCategory).filter_by(name="Strawberry").first().id),
+            Product(name="Blueberry", imageUrl="https://unsplash.com/photos/blueberries-on-white-ceramic-container-4qujjbj3srs", unit=Unit.KILOGRAM, unitPrice=8.0, stock=30, categoryId=session.query(ProductCategory).filter_by(name="Blueberry").first().id),
+            Product(name="Watermelon", imageUrl="https://unsplash.com/photos/three-slices-of-watermelon-on-a-cutting-board-cDcXinZpW7Q", unit=Unit.PIECE, unitPrice=3.0, stock=25, categoryId=session.query(ProductCategory).filter_by(name="Watermelon").first().id),
+            Product(name="Honeydew", imageUrl="https://unsplash.com/photos/a-cut-in-half-kiwi-fruit-on-a-purple-and-pink-background-ZtyIiKna9I0", unit=Unit.PIECE, unitPrice=3.2, stock=20, categoryId=session.query(ProductCategory).filter_by(name="Honeydew").first().id),
+
         ])
+        session.commit()
 
         print("Demo data inserted")
 
