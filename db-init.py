@@ -1,6 +1,7 @@
 import sqlalchemy as sa
 from sqlalchemy import URL
-from entities.Product import ProductCategory, Product
+from entities.Product import Product
+from entities.ProductCategory import ProductCategory
 
 connection_string = URL.create(
     'postgresql',
