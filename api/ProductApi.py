@@ -29,7 +29,8 @@ def get_products(
             if nameFilter:
                 filters.append(Product.name == nameFilter)
             if categoryIdFilter:
-                filters.append(Product.categoryId.in_(get_subcategory_ids(session, categoryIdFilter)))
+                category = session.exec(select(ProductCategory).where(ProductCategory.id == categoryIdFilter)).first()
+                filters.append(Product.categoryId.in_(get_subcategory_ids(category)))
             query = query.where(and_(*filters))
         
         # apply sorting
@@ -41,15 +42,11 @@ def get_products(
             
         return session.exec(query).all()
 
-def get_subcategory_ids(session, category_id):
-    subcategory_ids = [category_id]
-    
-    subcategories = session.exec(
-        select(ProductCategory).where(ProductCategory.parentCategoryId == category_id)
-    ).all()
+def get_subcategory_ids(category: ProductCategory) -> list[int]:
+    subcategory_ids = [category.id]
 
-    for subcategory in subcategories:
-        subcategory_ids.extend(get_subcategory_ids(session, subcategory.id))
+    for subcategory in category.childCategories:
+        subcategory_ids.extend(get_subcategory_ids(subcategory))
     
     return subcategory_ids
 
