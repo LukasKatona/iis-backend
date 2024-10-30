@@ -13,7 +13,7 @@ router = APIRouter()
 
 db = create_engine(DATABASE_URL)
 
-@router.get("/products")
+@router.get("/products", tags=["Products"])
 def get_products(
     nameFilter: Optional[str] = Query(None),
     categoryIdFilter: Optional[int] = Query(None),
@@ -51,7 +51,7 @@ def get_subcategory_ids(category: ProductCategory) -> list[int]:
     return subcategory_ids
 
     
-@router.get("/products/{product_id}")
+@router.get("/products/{product_id}", tags=["Products"])
 def get_product_by_id(product_id: int) -> Product:
     with Session(db) as session:
         return session.exec(select(Product).where(Product.id == product_id)).first()
