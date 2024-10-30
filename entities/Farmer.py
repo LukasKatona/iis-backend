@@ -11,7 +11,7 @@ class Farmer(SQLModel, table=True):
     CIN: str # Company Identification Number (ICO)
     VATIN: str # Value Added Tax Identification Number (DIC)
     VAT: str # Value Added Tax (IC DPH)
-    paysVat: bool
+    paysVat: bool = Field(default=False)
 
     bankCode: str
     accountNumber: str
