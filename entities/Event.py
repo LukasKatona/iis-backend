@@ -1,4 +1,5 @@
 # library imports
+from sqlalchemy import ForeignKeyConstraint
 from sqlmodel import Field, SQLModel
 
 class Event(SQLModel, table=True):
@@ -8,8 +9,12 @@ class Event(SQLModel, table=True):
     description: str
     startDate: str
     endDate: str
-    createdById: int = Field(default=None, foreign_key="farmers.id", index=True)
+    createdById: int = Field(default=None, index=True)
     createdAt: str
 
-    addressId: int = Field(default=None, foreign_key="addresses.id")
-    
+    addressId: int = Field(default=None)
+
+    __table_args__ = (
+        ForeignKeyConstraint(["createdById"], ["farmers.id"], name="events_createdById_fkey"),
+        ForeignKeyConstraint(["addressId"], ["addresses.id"], name="events_addressId_fkey"),
+    )

@@ -1,4 +1,5 @@
 # library imports
+from sqlalchemy import ForeignKeyConstraint
 from sqlmodel import Field, SQLModel
 
 # local imports
@@ -13,5 +14,10 @@ class Product(SQLModel, table=True):
     unitPrice: float
     VAT: float = Field(default=0.0)
     stock: int
-    categoryId : int = Field(default=None, foreign_key="product_categories.id", index=True, nullable=True)
-    farmerId: int = Field(default=None, foreign_key="farmers.id", index=True)
+    categoryId : int = Field(default=None, index=True, nullable=True)
+    farmerId: int = Field(default=None, index=True)
+
+    __table_args__ = (
+        ForeignKeyConstraint(["categoryId"], ["product_categories.id"], name="products_categoryId_fkey"),
+        ForeignKeyConstraint(["farmerId"], ["farmers.id"], name="products_farmerId_fkey"),
+    )

@@ -56,10 +56,3 @@ def get_product_by_id(product_id: int) -> Product:
     with Session(db) as session:
         return session.exec(select(Product).where(Product.id == product_id)).first()
     
-@router.post("/products/")
-def create_product_category(product: Product):
-    with Session(db) as session:
-        session.add(product)
-        session.commit()
-        session.refresh(product)
-        return product

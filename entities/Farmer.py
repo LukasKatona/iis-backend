@@ -1,10 +1,11 @@
 # library imports
+from sqlalchemy import ForeignKeyConstraint
 from sqlmodel import Field, SQLModel
 
 class Farmer(SQLModel, table=True):
     __tablename__ = 'farmers'
     id: int = Field(default=None, primary_key=True)
-    userId: int = Field(default=None, foreign_key="users.id")
+    userId: int = Field(default=None)
     farmName: str = Field(nullable=True)
     description: str = Field(nullable=True)
 
@@ -17,6 +18,11 @@ class Farmer(SQLModel, table=True):
     accountNumber: str
     iban: str = Field(nullable=True)
 
-    billingAddressId: int = Field(default=None, foreign_key="addresses.id", nullable=True)
+    billingAddressId: int = Field(default=None, nullable=True)
+
+    __table_args__ = (
+        ForeignKeyConstraint(["userId"], ["users.id"], name="farmers_userId_fkey"),
+        ForeignKeyConstraint(["billingAddressId"], ["addresses.id"], name="farmers_billingAddressId_fkey"),
+    )
 
     

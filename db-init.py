@@ -30,17 +30,17 @@ Base = sa.orm.declarative_base()
 
 def main() -> None:
     print("Dropping tables")
-    Address.metadata.drop_all(db)
-    User.metadata.drop_all(db)
-    Farmer.metadata.drop_all(db)
-    ProductCategory.metadata.drop_all(db)
-    NewCategoryRequest.metadata.drop_all(db)
-    Product.metadata.drop_all(db)
-    Order.metadata.drop_all(db)
-    OrderProductRelation.metadata.drop_all(db)
-    Event.metadata.drop_all(db)
-    UserEventRelation.metadata.drop_all(db)
     Review.metadata.drop_all(db)
+    UserEventRelation.metadata.drop_all(db)
+    Event.metadata.drop_all(db)
+    OrderProductRelation.metadata.drop_all(db)
+    Order.metadata.drop_all(db)
+    Product.metadata.drop_all(db)
+    NewCategoryRequest.metadata.drop_all(db)
+    ProductCategory.metadata.drop_all(db)
+    Farmer.metadata.drop_all(db)
+    User.metadata.drop_all(db)
+    Address.metadata.drop_all(db)
 
     print("Creating tables")
     Address.metadata.create_all(db)
@@ -58,12 +58,12 @@ def main() -> None:
     with Session() as session:
         print("Inserting addresses")
         session.add_all([
-            Address(state="Slovenská republika", city="Bratislava", street="Mlynské nivy", houseNumber="45", zipCode="821 09"),
-            Address(state="Slovenská republika", city="Bratislava", street="Miletičova", houseNumber="1", zipCode="821 08"),
-            Address(state="Slovenská republika", city="Bratislava", street="Špitálska", houseNumber="24", zipCode="811 08"),
-            Address(state="Česká republika", city="Brno", street="Kounicova", houseNumber="65", zipCode="602 00"),
-            Address(state="Česká republika", city="Brno", street="Veveří", houseNumber="113", zipCode="602 00"),
-            Address(state="Česká republika", city="Brno", street="Pekařská", houseNumber="11", zipCode="602 00"),
+            Address(state="Slovenská republika", city="Bratislava", street="Mlynské nivy", streetNumber="45", zipCode="821 09"),
+            Address(state="Slovenská republika", city="Bratislava", street="Miletičova", streetNumber="1", zipCode="821 08"),
+            Address(state="Slovenská republika", city="Bratislava", street="Špitálska", streetNumber="24", zipCode="811 08"),
+            Address(state="Česká republika", city="Brno", street="Kounicova", streetNumber="65", zipCode="602 00"),
+            Address(state="Česká republika", city="Brno", street="Veveří", streetNumber="113", zipCode="602 00"),
+            Address(state="Česká republika", city="Brno", street="Pekařská", streetNumber="11", zipCode="602 00"),
         ])
         session.commit()
 
