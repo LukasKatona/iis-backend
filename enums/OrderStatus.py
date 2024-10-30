@@ -1,11 +1,14 @@
 from enum import Enum
 
 class OrderStatus(Enum):
+    IN_CART = "in_cart"
+
     PENDING = "pending"
     ACCEPTED = "accepted"
     REJECTED = "rejected"
     CANCELLED = "cancelled"
-    COMPLETED = "completed"
-    REFUNDED = "refunded"
-    RETURNED = "returned"
+
     SHIPPED = "shipped"
+    SUPPLIED = "supplied"
+
+    REFUNDED = "refunded"
