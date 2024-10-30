@@ -25,3 +25,7 @@ Event.users = Relationship(UserEventRelation, back_populates="event")
 # Farmer 1 -- N Event
 Farmer.events = Relationship(Event, back_populates="createdByFarmer")
 Event.farmer = Relationship(Farmer, back_populates="createdEvents")
+
+# Farmer 1 -- N Product
+Farmer.products = Relationship(Product, back_populates="farmer")
+Product.farmer = Relationship(Farmer, back_populates="products")
