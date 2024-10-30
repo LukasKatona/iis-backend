@@ -7,6 +7,7 @@ from enums.Role import Role
 class User(SQLModel, table=True):
     __tablename__ = 'users'
     id: int = Field(default=None, primary_key=True)
+    farmerId: int = Field(nullable=True)
     role: Role = Field(default=Role.GUEST)
     name: str
     surname: str
