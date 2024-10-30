@@ -9,6 +9,6 @@ class Event(SQLModel, table=True):
     startDate: str
     endDate: str
     location: str
-    createdById: int
+    createdById: int = Field(default=None, foreign_key="farmers.id", index=True)
     createdAt: str
     
