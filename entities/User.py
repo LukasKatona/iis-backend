@@ -14,10 +14,6 @@ class User(SQLModel, table=True):
     email: str
     password: str
     phone: str = Field(nullable=True)
-    state: str = Field(nullable=True)
-    city: str = Field(nullable=True)
-    street: str = Field(nullable=True)
-    streetNumber: str = Field(nullable=True)
-    zipCode: str = Field(nullable=True)
     imageUrl: str = Field(nullable=True)
+    addressId: int = Field(default=None, foreign_key="addresses.id", nullable=True)
     

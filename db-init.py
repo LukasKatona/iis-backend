@@ -5,6 +5,14 @@ from sqlalchemy import URL
 # local imports
 from entities.Product import Product
 from entities.ProductCategory import ProductCategory
+from entities.User import User
+from entities.UserEventRelation import UserEventRelation
+from entities.Event import Event
+from entities.Farmer import Farmer
+from entities.Order import Order
+from entities.OrderProductRelation import OrderProductRelation
+from entities.Review import Review
+from entities.NewCategoryRequest import NewCategoryRequest
 from enums.Unit import Unit
 
 connection_string = URL.create(
@@ -21,14 +29,77 @@ Base = sa.orm.declarative_base()
 
 def main() -> None:
     print("Dropping tables")
-    Product.metadata.drop_all(db)
-    ProductCategory.metadata.drop_all(db)
-    print("Creating tables")
-    Product.metadata.create_all(db)
-    ProductCategory.metadata.create_all(db)
-    
 
+    User.metadata.drop_all(db)
+    Farmer.metadata.drop_all(db)
+
+    ProductCategory.metadata.drop_all(db)
+    NewCategoryRequest.metadata.drop_all(db)
+
+    Product.metadata.drop_all(db)
+    Order.metadata.drop_all(db)
+    OrderProductRelation.metadata.drop_all(db)
+
+    Event.metadata.drop_all(db)
+    UserEventRelation.metadata.drop_all(db)
+
+    Review.metadata.drop_all(db)
+
+    print("Creating tables")
+
+    User.metadata.create_all(db)
+    Farmer.metadata.create_all(db)
+
+    ProductCategory.metadata.create_all(db)
+    NewCategoryRequest.metadata.create_all(db)
+
+    Product.metadata.create_all(db)
+    Order.metadata.create_all(db)
+    OrderProductRelation.metadata.create_all(db)
+
+    Event.metadata.create_all(db)
+    UserEventRelation.metadata.create_all(db)
+
+    Review.metadata.create_all(db)
+    
     with Session() as session:
+        print("Inserting users")
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         print("Inserting categories")
         vegetables = ProductCategory(name="Vegetables")
         fruits = ProductCategory(name="Fruits")

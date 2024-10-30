@@ -8,7 +8,8 @@ class Event(SQLModel, table=True):
     description: str
     startDate: str
     endDate: str
-    location: str
     createdById: int = Field(default=None, foreign_key="farmers.id", index=True)
     createdAt: str
+
+    addressId: int = Field(default=None, foreign_key="addresses.id")
     

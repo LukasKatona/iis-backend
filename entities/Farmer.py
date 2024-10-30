@@ -7,7 +7,7 @@ class Farmer(SQLModel, table=True):
     userId: int = Field(default=None, foreign_key="users.id")
     farmName: str = Field(nullable=True)
     description: str = Field(nullable=True)
-    
+
     CIN: str # Company Identification Number (ICO)
     VATIN: str # Value Added Tax Identification Number (DIC)
     VAT: str # Value Added Tax (IC DPH)
@@ -16,5 +16,7 @@ class Farmer(SQLModel, table=True):
     bankCode: str
     accountNumber: str
     iban: str = Field(nullable=True)
+
+    billingAddressId: int = Field(default=None, foreign_key="addresses.id", nullable=True)
 
     
