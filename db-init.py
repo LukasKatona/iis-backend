@@ -175,6 +175,94 @@ def main() -> None:
         ])
         session.commit()
 
+        print("Inserting orders")
+        user1 = session.query(User).filter_by(name="James").first()
+        user2 = session.query(User).filter_by(name="Olivia").first()
+        user3 = session.query(User).filter_by(name="Michael").first()
+        farmer1 = session.query(Farmer).filter_by(farmName="John's Farm").first()
+        farmer2 = session.query(Farmer).filter_by(farmName="Emma's Farm").first()
+        session.add_all([
+            Order(orderNumber="ORD-001", userId=user1.id, farmerId=farmer1.id, createdAt="2021-10-01", status="ACCEPTED"),
+            Order(orderNumber="ORD-002", userId=user2.id, farmerId=farmer2.id, createdAt="2021-10-02", status="ACCEPTED"),
+            Order(orderNumber="ORD-003", userId=user3.id, farmerId=farmer1.id, createdAt="2021-10-03", status="ACCEPTED"),
+            Order(orderNumber="ORD-004", userId=user1.id, farmerId=farmer2.id, createdAt="2021-10-04", status="ACCEPTED"),
+        ])
+        session.commit()
+
+        print("Inserting order product relations")
+        order1 = session.query(Order).filter_by(orderNumber="ORD-001").first()
+        order2 = session.query(Order).filter_by(orderNumber="ORD-002").first()
+        order3 = session.query(Order).filter_by(orderNumber="ORD-003").first()
+        order4 = session.query(Order).filter_by(orderNumber="ORD-004").first()
+        product1 = session.query(Product).filter_by(name="Spinach").first()
+        product2 = session.query(Product).filter_by(name="Kale").first()
+        product3 = session.query(Product).filter_by(name="Carrot").first()
+        product4 = session.query(Product).filter_by(name="Beetroot").first()
+        product5 = session.query(Product).filter_by(name="Peas").first()
+        product6 = session.query(Product).filter_by(name="Beans").first()
+        product7 = session.query(Product).filter_by(name="Orange").first()
+        product8 = session.query(Product).filter_by(name="Lemon").first()
+        product9 = session.query(Product).filter_by(name="Strawberry").first()
+        product10 = session.query(Product).filter_by(name="Blueberry").first()
+        session.add_all([
+            OrderProductRelation(orderId=order1.id, productId=product1.id, quantity=2),
+            OrderProductRelation(orderId=order1.id, productId=product2.id, quantity=1),
+            OrderProductRelation(orderId=order2.id, productId=product3.id, quantity=3),
+            OrderProductRelation(orderId=order2.id, productId=product4.id, quantity=2),
+            OrderProductRelation(orderId=order3.id, productId=product5.id, quantity=1),
+            OrderProductRelation(orderId=order3.id, productId=product6.id, quantity=2),
+            OrderProductRelation(orderId=order4.id, productId=product7.id, quantity=3),
+            OrderProductRelation(orderId=order4.id, productId=product8.id, quantity=2),
+            OrderProductRelation(orderId=order4.id, productId=product9.id, quantity=1),
+            OrderProductRelation(orderId=order4.id, productId=product10.id, quantity=2),
+        ])
+        session.commit()
+
+        print("Inserting events")
+        farmer1 = session.query(Farmer).filter_by(farmName="John's Farm").first()
+        farmer2 = session.query(Farmer).filter_by(farmName="Emma's Farm").first()
+        farmer3 = session.query(Farmer).filter_by(farmName="Sophia's Farm").first()
+        session.add_all([
+            Event(name="Farmers Market", description="Join us at the farmers market to buy fresh produce directly from the farmers.", startDate="2024-10-01", endDate="2024-10-03", createdById=farmer1.id, createdAt="2024-09-01", addressId=address1.id),
+            Event(name="Farmers Market", description="Join us at the farmers market to buy fresh produce directly from the farmers.", startDate="2024-12-01", endDate="2024-12-03", createdById=farmer2.id, createdAt="2024-09-01", addressId=address2.id),
+            Event(name="Farmers Market", description="Join us at the farmers market to buy fresh produce directly from the farmers.", startDate="2025-10-01", endDate="2025-10-03", createdById=farmer3.id, createdAt="2025-09-01", addressId=address4.id),
+        ])
+        session.commit()
+
+        print("Inserting user event relations")
+        user1 = session.query(User).filter_by(name="James").first()
+        user2 = session.query(User).filter_by(name="Olivia").first()
+        user3 = session.query(User).filter_by(name="Michael").first()
+        event1 = session.query(Event).filter_by(name="Farmers Market").first()
+        event2 = session.query(Event).filter_by(name="Farmers Market").first()
+        event3 = session.query(Event).filter_by(name="Farmers Market").first()
+        session.add_all([
+            UserEventRelation(userId=user1.id, eventId=event1.id),
+            UserEventRelation(userId=user2.id, eventId=event2.id),
+            UserEventRelation(userId=user3.id, eventId=event3.id),
+            UserEventRelation(userId=user1.id, eventId=event2.id),
+            UserEventRelation(userId=user1.id, eventId=event3.id),
+        ])
+        session.commit()
+        
+        print("Inserting reviews")
+        user1 = session.query(User).filter_by(name="James").first()
+        user2 = session.query(User).filter_by(name="Olivia").first()
+        user3 = session.query(User).filter_by(name="Michael").first()
+        product1 = session.query(Product).filter_by(name="Spinach").first()
+        product2 = session.query(Product).filter_by(name="Kale").first()
+        product3 = session.query(Product).filter_by(name="Carrot").first()
+        product4 = session.query(Product).filter_by(name="Beetroot").first()
+        product5 = session.query(Product).filter_by(name="Peas").first()
+        session.add_all([
+            Review(userId=user1.id, productId=product1.id, rating=5, review="Great product!"),
+            Review(userId=user1.id, productId=product2.id, rating=4, review="Good product!"),
+            Review(userId=user2.id, productId=product3.id, rating=3, review="Average product!"),
+            Review(userId=user2.id, productId=product4.id, rating=2, review="Not so good product!"),
+            Review(userId=user3.id, productId=product5.id, rating=1, review="Bad product!"),
+        ])
+        session.commit()
+        
         print("Demo data inserted")
 
 if __name__ == "__main__":
