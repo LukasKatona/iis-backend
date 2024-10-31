@@ -254,12 +254,21 @@ def main() -> None:
         product3 = session.query(Product).filter_by(name="Carrot").first()
         product4 = session.query(Product).filter_by(name="Beetroot").first()
         product5 = session.query(Product).filter_by(name="Peas").first()
+        order1 = session.query(Order).filter_by(orderNumber="ORD-001").first()
+        order2 = session.query(Order).filter_by(orderNumber="ORD-002").first()
+        order3 = session.query(Order).filter_by(orderNumber="ORD-003").first()
+        order4 = session.query(Order).filter_by(orderNumber="ORD-004").first()
         session.add_all([
-            Review(userId=user1.id, productId=product1.id, rating=5, review="Great product!"),
-            Review(userId=user1.id, productId=product2.id, rating=4, review="Good product!"),
-            Review(userId=user2.id, productId=product3.id, rating=3, review="Average product!"),
-            Review(userId=user2.id, productId=product4.id, rating=2, review="Not so good product!"),
-            Review(userId=user3.id, productId=product5.id, rating=1, review="Bad product!"),
+            Review(userId=user1.id, productId=product1.id, rating=5, review="Great product!", createdAt="2021-10-01"),
+            Review(userId=user1.id, productId=product2.id, rating=4, review="Good product!", createdAt="2021-10-01"),
+            Review(userId=user2.id, productId=product3.id, rating=3, review="Average product!", createdAt="2021-10-02"),
+            Review(userId=user2.id, productId=product4.id, rating=2, review="Not so good product!", createdAt="2021-10-02"),
+            Review(userId=user3.id, productId=product5.id, rating=1, review="Bad product!", createdAt="2021-10-03"),
+            Review(userId=user3.id, productId=product6.id, rating=5, review="Great product!", createdAt="2021-10-03"),
+            Review(userId=user1.id, orderId=order1.id, rating=4, review="Good service!", createdAt="2021-10-01"),
+            Review(userId=user1.id, orderId=order2.id, rating=3, review="Average service!", createdAt="2021-10-01"),
+            Review(userId=user2.id, orderId=order3.id, rating=2, review="Not so good service!", createdAt="2021-10-02"),
+            Review(userId=user2.id, orderId=order4.id, rating=1, review="Bad service!", createdAt="2021-10-02"),
         ])
         session.commit()
         
