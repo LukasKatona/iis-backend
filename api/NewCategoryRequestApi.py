@@ -42,6 +42,7 @@ def update_category_request_status(category_id: int, new_state: CategoryRequestS
     with Session(db) as session:
         category_request = session.get(NewCategoryRequest, category_id)
         category_request.state = new_state
-        session.commit()
+        session.commit() 
         session.refresh(category_request)
         return category_request
+ 
