@@ -1,9 +1,10 @@
 # library imports
-from fastapi import APIRouter
+from typing import Optional
+from fastapi import APIRouter, Query
 from sqlmodel import Session, create_engine, select
 
 # local imports
-from entities.ProductCategory import ProductCategory
+from entities.ProductCategory import ProductCategory, ProductCategoryCreate, ProductCategoryUpdate
 from constants.databaseURL import DATABASE_URL
 
 router = APIRouter()
@@ -14,9 +15,56 @@ db = create_engine(DATABASE_URL)
 def get_product_categories() -> list[ProductCategory]:
     with Session(db) as session:
         return session.exec(select(ProductCategory)).all()
-
     
-@router.get("/product-categories/{category_id}", tags=["Product Categories"])
-def get_product_category_by_id(category_id: int) -> ProductCategory:
+@router.post("/product-categories", tags=["Product Categories"])
+def create_product_category(category_create: ProductCategoryCreate) -> ProductCategory:
     with Session(db) as session:
-        return session.exec(select(ProductCategory).where(ProductCategory.id == category_id)).first()
+        category = ProductCategory(name=category_create.name, parentCategoryId=category_create.parentCategoryId)
+        session.add(category)
+        session.commit()
+        session.refresh(category)
+        return category
+    
+@router.patch("/product-categories/{category_id}", tags=["Product Categories"])
+def update_product_category(
+    category_id: int,
+    category_update: ProductCategoryUpdate
+) -> ProductCategory:
+    with Session(db) as session:
+        category = session.exec(select(ProductCategory).where(ProductCategory.id == category_id)).one()
+        category.name = category_update.name
+        session.add(category)
+        session.commit()
+        session.refresh(category)
+        return category
+    
+@router.delete("/product-categories/{category_id}", tags=["Product Categories"])
+def delete_product_category(
+    category_id: int,
+    delete_children: Optional[bool] = Query(False)
+) -> bool:
+    with Session(db) as session:
+        try:
+            category = session.exec(select(ProductCategory).where(ProductCategory.id == category_id)).one()
+            if delete_children:
+                delete_child_categories(category, session)
+            else:
+                move_child_categories_up(category, session)
+            session.delete(category)
+            session.commit()
+            return True
+        except Exception as e:
+            session.rollback()
+            print(e)
+            return False
+        
+    
+def delete_child_categories(category: ProductCategory, session: Session):
+    for child in category.childCategories:
+        delete_child_categories(child, session)
+        session.delete(child)
+
+def move_child_categories_up(category: ProductCategory, session: Session):
+    for child in category.childCategories:
+        child.parentCategoryId = category.parentCategoryId
+        session.add(child) #TODO: error, child.parentCategoryId is set to null
