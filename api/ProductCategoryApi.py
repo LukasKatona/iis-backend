@@ -41,21 +41,16 @@ def update_product_category(
 @router.delete("/product-categories/{category_id}", tags=["Product Categories"])
 def delete_product_category(
     category_id: int,
-    delete_children: Optional[bool] = Query(False)
 ) -> bool:
     with Session(db) as session:
         try:
             category = session.exec(select(ProductCategory).where(ProductCategory.id == category_id)).one()
-            if delete_children:
-                delete_child_categories(category, session)
-            else:
-                move_child_categories_up(category, session)
+            delete_child_categories(category, session)
             session.delete(category)
             session.commit()
             return True
         except Exception as e:
             session.rollback()
-            print(e)
             return False
         
     
@@ -63,8 +58,3 @@ def delete_child_categories(category: ProductCategory, session: Session):
     for child in category.childCategories:
         delete_child_categories(child, session)
         session.delete(child)
-
-def move_child_categories_up(category: ProductCategory, session: Session):
-    for child in category.childCategories:
-        child.parentCategoryId = category.parentCategoryId
-        session.add(child) #TODO: error, child.parentCategoryId is set to null
