@@ -9,22 +9,26 @@ from constants.databaseURL import DATABASE_URL
 router = APIRouter()
 db = create_engine(DATABASE_URL)
 
+from fastapi import Query
+
 @router.get("/category-requests", response_model=List[NewCategoryRequest], tags=["Category Requests"])
-def get_category_requests() -> List[NewCategoryRequest]:
+def get_category_requests(user_id: Optional[int] = Query(None), status: Optional[CategoryRequestState] = Query(None)) -> List[NewCategoryRequest]:
     with Session(db) as session:
-        category_requests = session.exec(select(NewCategoryRequest)).all()
+        query = select(NewCategoryRequest)
+        
+        if user_id is not None:
+            query = query.where(NewCategoryRequest.createdById == user_id)
+        
+        if status is not None:
+            query = query.where(NewCategoryRequest.state == status)
+        
+        category_requests = session.exec(query).all()
         return category_requests
+
 
 @router.post("/category-request", response_model=NewCategoryRequest, tags=["Category Requests"])
 def create_category_request(newCategoryName: str, createdById: int, parentCategoryId: Optional[int] = None, state: CategoryRequestState = CategoryRequestState.PENDING ) -> NewCategoryRequest:
-    with Session(db) as session:
-        # existing_request = session.exec(
-        #     select(NewCategoryRequest).where(NewCategoryRequest.newCategoryName == newCategoryName)
-        # ).first()
-        
-        # if existing_request:
-        #     raise HTTPException(status_code=400, detail="Category request with this name already exists.")
-        
+    with Session(db) as session:        
         new_request = NewCategoryRequest(
             newCategoryName=newCategoryName,
             parentCategoryId=parentCategoryId,
@@ -44,5 +48,13 @@ def update_category_request_status(category_id: int, new_state: CategoryRequestS
         category_request.state = new_state
         session.commit() 
         session.refresh(category_request)
+        return category_request
+    
+@router.delete("/category-request/{category_id}", response_model=NewCategoryRequest, tags=["Category Requests"])
+def delete_category_request(category_id: int) -> NewCategoryRequest:
+    with Session(db) as session:
+        category_request = session.get(NewCategoryRequest, category_id)
+        session.delete(category_request)
+        session.commit()
         return category_request
  

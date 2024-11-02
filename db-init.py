@@ -182,10 +182,10 @@ def main() -> None:
         farmer1 = session.query(Farmer).filter_by(farmName="John's Farm").first()
         farmer2 = session.query(Farmer).filter_by(farmName="Emma's Farm").first()
         session.add_all([
-            Order(orderNumber="ORD-001", userId=user1.id, farmerId=farmer1.id, createdAt="2021-10-01", status="ACCEPTED"),
-            Order(orderNumber="ORD-002", userId=user2.id, farmerId=farmer2.id, createdAt="2021-10-02", status="ACCEPTED"),
-            Order(orderNumber="ORD-003", userId=user3.id, farmerId=farmer1.id, createdAt="2021-10-03", status="ACCEPTED"),
-            Order(orderNumber="ORD-004", userId=user1.id, farmerId=farmer2.id, createdAt="2021-10-04", status="ACCEPTED"),
+            Order(orderNumber="ORD-001", userId=user1.id, farmerId=farmer1.id, createdAt="2021-10-01 10:00", status="ACCEPTED"),
+            Order(orderNumber="ORD-002", userId=user2.id, farmerId=farmer2.id, createdAt="2021-10-02 10:00", status="ACCEPTED"),
+            Order(orderNumber="ORD-003", userId=user3.id, farmerId=farmer1.id, createdAt="2021-10-03 10:00", status="ACCEPTED"),
+            Order(orderNumber="ORD-004", userId=user1.id, farmerId=farmer2.id, createdAt="2021-10-04 10:00", status="ACCEPTED"),
         ])
         session.commit()
 
@@ -223,9 +223,9 @@ def main() -> None:
         farmer2 = session.query(Farmer).filter_by(farmName="Emma's Farm").first()
         farmer3 = session.query(Farmer).filter_by(farmName="Sophia's Farm").first()
         session.add_all([
-            Event(name="Farmers Market", description="Join us at the farmers market to buy fresh produce directly from the farmers.", startDate="2024-10-01", endDate="2024-10-03", createdById=farmer1.id, createdAt="2024-09-01", addressId=address1.id),
-            Event(name="Farmers Market", description="Join us at the farmers market to buy fresh produce directly from the farmers.", startDate="2024-12-01", endDate="2024-12-03", createdById=farmer2.id, createdAt="2024-09-01", addressId=address2.id),
-            Event(name="Farmers Market", description="Join us at the farmers market to buy fresh produce directly from the farmers.", startDate="2025-10-01", endDate="2025-10-03", createdById=farmer3.id, createdAt="2025-09-01", addressId=address4.id),
+            Event(name="Farmers Market", description="Join us at the farmers market to buy fresh produce directly from the farmers.", startDate="2024-10-01 12:30", endDate="2024-10-03 20:00", createdById=farmer1.id, createdAt="2024-09-01 11:00", addressId=address1.id),
+            Event(name="Farmers Market", description="Join us at the farmers market to buy fresh produce directly from the farmers.", startDate="2024-12-01 12:30", endDate="2024-12-03 20:00", createdById=farmer2.id, createdAt="2024-09-01 11:00", addressId=address2.id),
+            Event(name="Farmers Market", description="Join us at the farmers market to buy fresh produce directly from the farmers.", startDate="2025-10-01 12:30", endDate="2025-10-03 20:00", createdById=farmer3.id, createdAt="2025-09-01 11:00", addressId=address4.id),
         ])
         session.commit()
 
@@ -259,16 +259,16 @@ def main() -> None:
         order3 = session.query(Order).filter_by(orderNumber="ORD-003").first()
         order4 = session.query(Order).filter_by(orderNumber="ORD-004").first()
         session.add_all([
-            Review(userId=user1.id, productId=product1.id, rating=5, review="Great product!", createdAt="2021-10-01"),
-            Review(userId=user1.id, productId=product2.id, rating=4, review="Good product!", createdAt="2021-10-01"),
-            Review(userId=user2.id, productId=product3.id, rating=3, review="Average product!", createdAt="2021-10-02"),
-            Review(userId=user2.id, productId=product4.id, rating=2, review="Not so good product!", createdAt="2021-10-02"),
-            Review(userId=user3.id, productId=product5.id, rating=1, review="Bad product!", createdAt="2021-10-03"),
-            Review(userId=user3.id, productId=product6.id, rating=5, review="Great product!", createdAt="2021-10-03"),
-            Review(userId=user1.id, orderId=order1.id, rating=4, review="Good service!", createdAt="2021-10-01"),
-            Review(userId=user1.id, orderId=order2.id, rating=3, review="Average service!", createdAt="2021-10-01"),
-            Review(userId=user2.id, orderId=order3.id, rating=2, review="Not so good service!", createdAt="2021-10-02"),
-            Review(userId=user2.id, orderId=order4.id, rating=1, review="Bad service!", createdAt="2021-10-02"),
+            Review(userId=user1.id, productId=product1.id, rating=5, review="Great product!", createdAt="2021-10-01 11:00"),
+            Review(userId=user1.id, productId=product2.id, rating=4, review="Good product!", createdAt="2021-10-01 11:00"),
+            Review(userId=user2.id, productId=product3.id, rating=3, review="Average product!", createdAt="2021-10-02 11:00"),
+            Review(userId=user2.id, productId=product4.id, rating=2, review="Not so good product!", createdAt="2021-10-02 11:00"),
+            Review(userId=user3.id, productId=product5.id, rating=1, review="Bad product!", createdAt="2021-10-03 11:00"),
+            Review(userId=user3.id, productId=product6.id, rating=5, review="Great product!", createdAt="2021-10-03 11:00"),
+            Review(userId=user1.id, orderId=order1.id, rating=4, review="Good service!", createdAt="2021-10-01 11:00"),
+            Review(userId=user1.id, orderId=order2.id, rating=3, review="Average service!", createdAt="2021-10-01 11:00"),
+            Review(userId=user2.id, orderId=order3.id, rating=2, review="Not so good service!", createdAt="2021-10-02 11:00"),
+            Review(userId=user2.id, orderId=order4.id, rating=1, review="Bad service!", createdAt="2021-10-02 11:00"),
         ])
         session.commit()
         

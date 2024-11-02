@@ -108,7 +108,7 @@ def update_product_in_order(order_id: int, product_id: int, quantity: int):
         ).first()
 
         if product.stock < quantity:
-            raise HTTPException(status_code=400, detail="Not enough stock available for the requested quantity update.")
+            raise HTTPException(status_code=400, detail="Not enough stock available")
 
         current_quantity = relation.quantity
         relation.quantity = quantity
@@ -140,7 +140,7 @@ def delete_order(order_id: int):
         order = session.get(Order, order_id)
       
         if order.status != OrderStatus.IN_CART:
-            raise HTTPException(status_code=400, detail="Only orders with status 'IN_CART' can be deleted.")
+            raise HTTPException(status_code=400, detail="Only 'IN_CART' can be deleted.")
         
         order_products = session.exec(
             select(OrderProductRelation).where(OrderProductRelation.orderId == order_id)
@@ -163,7 +163,7 @@ def delete_product_from_order(order_id: int, product_id: int):
         order = session.get(Order, order_id)
        
         if order.status != OrderStatus.IN_CART:
-            raise HTTPException(status_code=400, detail="Products can only be removed from orders with status 'IN_CART'.")
+            raise HTTPException(status_code=400, detail="only 'IN_CART'.")
 
         relation = session.exec(
             select(OrderProductRelation)
