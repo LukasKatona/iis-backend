@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Response
 from typing import List, Optional
 from sqlmodel import Session, create_engine, select
 from datetime import datetime
@@ -32,22 +32,6 @@ def get_orders(user_id: Optional[int] = None, farmer_id: Optional[int] = None, s
         
         return session.exec(query).all()
 
-@router.post("/orders", response_model=Order, tags=['Orders'])
-def create_order(user_id: int, farmer_id: int):
-    
-    with Session(db) as session:
-        new_order = Order(
-            orderNumber=generate_order_number(),
-            userId=user_id,
-            farmerId=farmer_id,
-            status=OrderStatus.PENDING, #Pending?
-            createdAt=formatted_date
-        )
-        
-        session.add(new_order)
-        session.commit()
-        session.refresh(new_order)
-        return new_order
 
 @router.patch("/orders/{order_id}/status", response_model=Order, tags=['Orders'])
 def update_order_status(order_id: int, new_status: OrderStatus):
@@ -68,8 +52,6 @@ def update_order_status(order_id: int, new_status: OrderStatus):
 
 @router.post("/orders/add-product", response_model=Order, tags=['Orders'])
 def add_product_to_order(user_id: int, product_id: int, quantity: int):
-    if quantity <= 0:
-        raise HTTPException(status_code=400, detail="Quantity must be greater than zero.")
     
     with Session(db) as session:
         product = session.get(Product, product_id)
@@ -90,7 +72,7 @@ def add_product_to_order(user_id: int, product_id: int, quantity: int):
                 userId=user_id,
                 farmerId=product.farmerId,
                 status=OrderStatus.IN_CART,
-                createdAt=datetime.now().isoformat()
+                createdAt=formatted_date
             )
             session.add(existing_order)
             session.commit()
@@ -108,6 +90,7 @@ def add_product_to_order(user_id: int, product_id: int, quantity: int):
             relation = OrderProductRelation(orderId=existing_order.id, productId=product.id, quantity=quantity)
             session.add(relation)
         
+        product.stock -= quantity
         session.commit()
         session.refresh(existing_order)
         
@@ -117,21 +100,21 @@ def add_product_to_order(user_id: int, product_id: int, quantity: int):
 def update_product_in_order(order_id: int, product_id: int, quantity: int):
     with Session(db) as session:
         order = session.get(Order, order_id)
-        if not order:
-            raise HTTPException(status_code=404, detail="Order not found.")
-
         product = session.get(Product, product_id)
-        if not product:
-            raise HTTPException(status_code=404, detail="Product not found.")
         
         relation = session.exec(
             select(OrderProductRelation)
             .where(OrderProductRelation.orderId == order_id, OrderProductRelation.productId == product_id)
         ).first()
 
-        if quantity > 0:
-            relation.quantity = quantity
-        else:
+        if product.stock < quantity:
+            raise HTTPException(status_code=400, detail="Not enough stock available for the requested quantity update.")
+
+        current_quantity = relation.quantity
+        relation.quantity = quantity
+        product.stock = product.stock - (quantity - current_quantity)
+
+        if quantity == 0:
             session.delete(relation)
             session.commit()
 
@@ -141,7 +124,65 @@ def update_product_in_order(order_id: int, product_id: int, quantity: int):
             
             if not remaining_products:
                 session.delete(order)
+                session.commit()
+                return Response(status_code=204)
+                
 
+        session.commit()
+        if order in session:
+            session.refresh(order)
+        
+        return order
+
+@router.delete("/orders/{order_id}", response_model=Order, tags=['Orders'])
+def delete_order(order_id: int):
+    with Session(db) as session:
+        order = session.get(Order, order_id)
+      
+        if order.status != OrderStatus.IN_CART:
+            raise HTTPException(status_code=400, detail="Only orders with status 'IN_CART' can be deleted.")
+        
+        order_products = session.exec(
+            select(OrderProductRelation).where(OrderProductRelation.orderId == order_id)
+        ).all()
+        
+        for relation in order_products:
+            product = session.get(Product, relation.productId)
+            if product:
+                product.stock += relation.quantity
+            session.delete(relation)
+        session.commit() 
+        session.delete(order)
+        session.commit()
+        
+        return order
+
+@router.delete("/orders/{order_id}/product/{product_id}", response_model=Order, tags=['Orders'])
+def delete_product_from_order(order_id: int, product_id: int):
+    with Session(db) as session:
+        order = session.get(Order, order_id)
+       
+        if order.status != OrderStatus.IN_CART:
+            raise HTTPException(status_code=400, detail="Products can only be removed from orders with status 'IN_CART'.")
+
+        relation = session.exec(
+            select(OrderProductRelation)
+            .where(OrderProductRelation.orderId == order_id, OrderProductRelation.productId == product_id)
+        ).first()
+        
+        product = session.get(Product, product_id)
+        if product:
+            product.stock += relation.quantity
+        
+        session.delete(relation)
+        
+        remaining_products = session.exec(
+            select(OrderProductRelation).where(OrderProductRelation.orderId == order_id)
+        ).all()
+        
+        if not remaining_products:
+            session.delete(order)
+        
         session.commit()
         session.refresh(order)
         
