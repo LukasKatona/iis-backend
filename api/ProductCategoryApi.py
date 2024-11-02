@@ -1,10 +1,9 @@
 # library imports
-from typing import Optional
-from fastapi import APIRouter, Query
+from fastapi import APIRouter
 from sqlmodel import Session, create_engine, select
 
 # local imports
-from entities.ProductCategory import ProductCategory, ProductCategoryCreate, ProductCategoryUpdate
+from entities.ProductCategory import ProductCategory, ProductCategoryUpdate
 from constants.databaseURL import DATABASE_URL
 
 router = APIRouter()
@@ -17,9 +16,8 @@ def get_product_categories() -> list[ProductCategory]:
         return session.exec(select(ProductCategory)).all()
     
 @router.post("/product-categories", tags=["Product Categories"])
-def create_product_category(category_create: ProductCategoryCreate) -> ProductCategory:
+def create_product_category(category: ProductCategory) -> ProductCategory:
     with Session(db) as session:
-        category = ProductCategory(name=category_create.name, parentCategoryId=category_create.parentCategoryId)
         session.add(category)
         session.commit()
         session.refresh(category)
