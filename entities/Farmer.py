@@ -18,11 +18,14 @@ class Farmer(SQLModel, table=True):
     accountNumber: str
     iban: str = Field(nullable=True)
 
-    billingAddressId: int = Field(default=None, nullable=True)
+    state: str = Field(nullable=True)
+    city: str = Field(nullable=True)
+    street: str = Field(nullable=True)
+    streetNumber: str = Field(nullable=True)
+    zipCode: str = Field(nullable=True)
 
     __table_args__ = (
         ForeignKeyConstraint(["userId"], ["users.id"], name="farmers_userId_fkey"),
-        ForeignKeyConstraint(["billingAddressId"], ["addresses.id"], name="farmers_billingAddressId_fkey"),
     )
 
     

@@ -16,10 +16,14 @@ class User(SQLModel, table=True):
     password: str
     phone: str = Field(nullable=True)
     imageUrl: str = Field(nullable=True)
-    addressId: int = Field(default=None, nullable=True)
+    
+    state: str = Field(nullable=True)
+    city: str = Field(nullable=True)
+    street: str = Field(nullable=True)
+    streetNumber: str = Field(nullable=True)
+    zipCode: str = Field(nullable=True)
 
     __table_args__ = (
         ForeignKeyConstraint(["farmerId"], ["farmers.id"], name="users_farmerId_fkey"),
-        ForeignKeyConstraint(["addressId"], ["addresses.id"], name="users_addressId_fkey"),
     )
     
