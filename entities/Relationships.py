@@ -1,7 +1,6 @@
 
 from sqlmodel import Relationship
 
-from entities.Address import Address
 from entities.Product import Product
 from entities.ProductCategory import ProductCategory
 from entities.User import User
@@ -68,15 +67,3 @@ ProductCategory.newChildCategoryRequests = Relationship(NewCategoryRequest, back
 # New Category Request N -- 1 User
 NewCategoryRequest.createdByUser = Relationship(User, back_populates="newCategoryRequests")
 User.newCategoryRequests = Relationship(NewCategoryRequest, back_populates="createdByUser")
-
-# Address 1 -- 1 Event
-Event.address = Relationship(Address, back_populates="event")
-Address.event = Relationship(Event, back_populates="address")
-
-# Address 1 -- 1 Farmer
-Farmer.address = Relationship(Address, back_populates="farmer")
-Address.farmer = Relationship(Farmer, back_populates="address")
-
-# Address 1 -- 1 User
-User.address = Relationship(Address, back_populates="user")
-Address.user = Relationship(User, back_populates="address")

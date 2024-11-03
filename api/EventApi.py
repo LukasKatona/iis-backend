@@ -5,6 +5,8 @@ from sqlalchemy import and_
 from sqlmodel import Session, create_engine, select
 
 # local imports
+from entities.Farmer import Farmer
+from entities.User import User
 from entities.Event import Event, EventUpdate
 from entities.UserEventRelation import UserEventRelation
 from constants.databaseURL import DATABASE_URL
@@ -78,6 +80,37 @@ def delete_event(event_id: int) -> bool:
             session.delete(event)
             session.commit()
             return True
+        except Exception as e:
+            print(e)
+            session.rollback()
+            return False
+        
+@router.post("/events/{event_id}/join/{user_id}", tags=["Events"])
+def join_event(
+    event_id: int,
+    user_id: int
+) -> bool:
+    with Session(db) as session:
+        try:
+            session.add(UserEventRelation(userId=user_id, eventId=event_id))
+            session.commit()
+            return True
         except:
+            session.rollback()
+            return False
+        
+@router.delete("/events/{event_id}/leave/{user_id}", tags=["Events"])
+def leave_event(
+    event_id: int,
+    user_id: int
+) -> bool:
+    with Session(db) as session:
+        try:
+            relation = session.exec(select(UserEventRelation).where(and_(UserEventRelation.eventId == event_id, UserEventRelation.userId == user_id))).one()
+            session.delete(relation)
+            session.commit()
+            return True
+        except Exception as e:
+            print(e)
             session.rollback()
             return False
