@@ -16,9 +16,9 @@ class Order(SQLModel, table=True):
     suppliedAt: str = Field(nullable=True)
 
     __table_args__ = (
-        ForeignKeyConstraint(["userId"], ["users.id"], name="orders_userId_fkey"),
-        ForeignKeyConstraint(["farmerId"], ["farmers.id"], name="orders_farmerId_fkey"),
-        ForeignKeyConstraint(["reviewId"], ["reviews.id"], name="orders_reviewId_fkey"),
+        ForeignKeyConstraint(["userId"], ["users.id"], name="orders_userId_fkey", ondelete="CASCADE"),
+        ForeignKeyConstraint(["farmerId"], ["farmers.id"], name="orders_farmerId_fkey", ondelete="CASCADE"),
+        ForeignKeyConstraint(["reviewId"], ["reviews.id"], name="orders_reviewId_fkey", ondelete="SET NULL"),
     )
 
 

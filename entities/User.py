@@ -24,6 +24,6 @@ class User(SQLModel, table=True):
     zipCode: str = Field(nullable=True)
 
     __table_args__ = (
-        ForeignKeyConstraint(["farmerId"], ["farmers.id"], name="users_farmerId_fkey"),
+        ForeignKeyConstraint(["farmerId"], ["farmers.id"], name="users_farmerId_fkey", ondelete="SET NULL"),
     )
     

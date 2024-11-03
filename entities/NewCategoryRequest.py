@@ -12,6 +12,6 @@ class NewCategoryRequest(SQLModel, table=True):
     createdById: int = Field(default=None, index=True)
 
     __table_args__ = (
-        ForeignKeyConstraint(["parentCategoryId"], ["product_categories.id"], name="newcategoryrequest_parentCategoryId_fkey"),
-        ForeignKeyConstraint(["createdById"], ["users.id"], name="newcategoryrequest_createdById_fkey"),
+        ForeignKeyConstraint(["parentCategoryId"], ["product_categories.id"], name="newcategoryrequest_parentCategoryId_fkey", ondelete="CASCADE"),
+        ForeignKeyConstraint(["createdById"], ["users.id"], name="newcategoryrequest_createdById_fkey", ondelete="CASCADE"),
     )

@@ -20,7 +20,7 @@ class Event(SQLModel, table=True):
     zipCode: str = Field(nullable=True)
 
     __table_args__ = (
-        ForeignKeyConstraint(["createdById"], ["farmers.id"], name="events_createdById_fkey"),
+        ForeignKeyConstraint(["createdById"], ["farmers.id"], name="events_createdById_fkey", ondelete="CASCADE"),
     )
 
 class EventUpdate(SQLModel):

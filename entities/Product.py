@@ -18,6 +18,6 @@ class Product(SQLModel, table=True):
     farmerId: int = Field(default=None, index=True)
 
     __table_args__ = (
-        ForeignKeyConstraint(["categoryId"], ["product_categories.id"], name="products_categoryId_fkey"),
-        ForeignKeyConstraint(["farmerId"], ["farmers.id"], name="products_farmerId_fkey"),
+        ForeignKeyConstraint(["categoryId"], ["product_categories.id"], name="products_categoryId_fkey", ondelete="SET NULL"),
+        ForeignKeyConstraint(["farmerId"], ["farmers.id"], name="products_farmerId_fkey", ondelete="CASCADE"),
     )
