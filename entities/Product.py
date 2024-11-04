@@ -20,7 +20,7 @@ class Product(SQLModel, table=True):
 
     __table_args__ = (
         ForeignKeyConstraint(["categoryId"], ["product_categories.id"], name="products_categoryId_fkey"),
-        #ForeignKeyConstraint(["farmerId"], ["farmers.id"], name="products_farmerId_fkey"),
+        ForeignKeyConstraint(["farmerId"], ["farmers.id"], name="products_farmerId_fkey"),
     )
 
 class ProductUpdate(SQLModel):
