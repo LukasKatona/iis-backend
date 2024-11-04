@@ -1,5 +1,6 @@
 # library imports
-from sqlalchemy import ForeignKeyConstraint
+from typing import Optional
+from sqlalchemy import ForeignKeyConstraint, UniqueConstraint
 from sqlmodel import Field, SQLModel
 
 class Farmer(SQLModel, table=True):
@@ -18,11 +19,32 @@ class Farmer(SQLModel, table=True):
     accountNumber: str
     iban: str = Field(nullable=True)
 
-    billingAddressId: int = Field(default=None, nullable=True)
+    state: str = Field(nullable=True)
+    city: str = Field(nullable=True)
+    street: str = Field(nullable=True)
+    streetNumber: str = Field(nullable=True)
+    zipCode: str = Field(nullable=True)
 
     __table_args__ = (
-        ForeignKeyConstraint(["userId"], ["users.id"], name="farmers_userId_fkey"),
-        ForeignKeyConstraint(["billingAddressId"], ["addresses.id"], name="farmers_billingAddressId_fkey"),
+        ForeignKeyConstraint(["userId"], ["users.id"], name="farmers_userId_fkey", ondelete="CASCADE"),
+        UniqueConstraint("userId", name="unique_user_per_farmer"),
     )
 
-    
+class FarmerUpdate(SQLModel):
+    farmName: Optional[str] = None
+    description: Optional[str] = None
+
+    CIN: Optional[str] = None
+    VATIN: Optional[str] = None
+    VAT: Optional[str] = None
+    paysVat: Optional[bool] = None
+
+    bankCode: Optional[str] = None
+    accountNumber: Optional[str] = None
+    iban: Optional[str] = None
+
+    state: Optional[str] = None
+    city: Optional[str] = None
+    street: Optional[str] = None
+    streetNumber: Optional[str] = None
+    zipCode: Optional[str] = None

@@ -3,7 +3,6 @@ import sqlalchemy as sa
 from sqlalchemy import URL
 
 # local imports
-from entities.Address import Address
 from entities.Product import Product
 from entities.ProductCategory import ProductCategory
 from entities.User import User
@@ -40,10 +39,8 @@ def main() -> None:
     ProductCategory.metadata.drop_all(db)
     Farmer.metadata.drop_all(db)
     User.metadata.drop_all(db)
-    Address.metadata.drop_all(db)
 
     print("Creating tables")
-    Address.metadata.create_all(db)
     User.metadata.create_all(db)
     Farmer.metadata.create_all(db)
     ProductCategory.metadata.create_all(db)
@@ -56,31 +53,14 @@ def main() -> None:
     Review.metadata.create_all(db)
     
     with Session() as session:
-        print("Inserting addresses")
-        session.add_all([
-            Address(state="Slovenská republika", city="Bratislava", street="Mlynské nivy", streetNumber="45", zipCode="821 09"),
-            Address(state="Slovenská republika", city="Bratislava", street="Miletičova", streetNumber="1", zipCode="821 08"),
-            Address(state="Slovenská republika", city="Bratislava", street="Špitálska", streetNumber="24", zipCode="811 08"),
-            Address(state="Česká republika", city="Brno", street="Kounicova", streetNumber="65", zipCode="602 00"),
-            Address(state="Česká republika", city="Brno", street="Veveří", streetNumber="113", zipCode="602 00"),
-            Address(state="Česká republika", city="Brno", street="Pekařská", streetNumber="11", zipCode="602 00"),
-        ])
-        session.commit()
-
         print("Inserting users")
-        address1 = session.query(Address).filter_by(street="Mlynské nivy").first()
-        address2 = session.query(Address).filter_by(street="Miletičova").first()
-        address3 = session.query(Address).filter_by(street="Špitálska").first()
-        address4 = session.query(Address).filter_by(street="Kounicova").first()
-        address5 = session.query(Address).filter_by(street="Veveří").first()
-        address6 = session.query(Address).filter_by(street="Pekařská").first()
         session.add_all([
-            User(name="John", surname="Doe", email="jd@gmail.com", password="password", phone="+421908111222", addressId=address1.id),
-            User(name="Emma", surname="Smith", email="es@gmail.com", password="password", phone="+421908111223", addressId=address2.id),
-            User(name="Michael", surname="Johnson", email="mj@gmail.com", password="password", phone="+421908111224", addressId=address3.id),
-            User(name="Sophia", surname="Williams", email="sw@gmail.com", password="password", phone="+420777111222", addressId=address4.id),
-            User(name="James", surname="Brown", email="jb@gmail.com", password="password", phone="+420777111223", addressId=address5.id),
-            User(name="Olivia", surname="Davis", email="od@gmail.com", password="password", phone="+420777111224", addressId=address6.id),
+            User(name="John", surname="Doe", email="jd@gmail.com", password="password", phone="+421908111222", state="Slovenská republika", city="Bratislava", street="Mlynské nivy", streetNumber="45", zipCode="821 09"),
+            User(name="Emma", surname="Smith", email="es@gmail.com", password="password", phone="+421908111223", state="Slovenská republika", city="Košice", street="Hlavná", streetNumber="1", zipCode="040 01"),
+            User(name="Michael", surname="Johnson", email="mj@gmail.com", password="password", phone="+421908111224", state="Slovenská republika", city="Žilina", street="Námestie A. Hlinku", streetNumber="1", zipCode="010 01"),
+            User(name="Sophia", surname="Williams", email="sw@gmail.com", password="password", phone="+420777111222", state="Česká republika", city="Brno", street="Náměstí Svobody", streetNumber="1", zipCode="602 00"),
+            User(name="James", surname="Brown", email="jb@gmail.com", password="password", phone="+420777111223", state="Česká republika", city="Praha", street="Václavské náměstí", streetNumber="1", zipCode="110 00"),
+            User(name="Olivia", surname="Davis", email="od@gmail.com", password="password", phone="+420777111224", state="Česká republika", city="Ostrava", street="Masarykovo náměstí", streetNumber="1", zipCode="702 00"),
         ])
         session.commit()
 
@@ -89,9 +69,9 @@ def main() -> None:
         user2 = session.query(User).filter_by(name="Emma").first()
         user3 = session.query(User).filter_by(name="Sophia").first()
         session.add_all([
-            Farmer(userId=user1.id, farmName="John's Farm", description="We are a small family farm located in the heart of Bratislava. We grow a variety of vegetables and fruits and we are proud to offer our customers the freshest produce.", CIN="12345678", VATIN="12345678", VAT="SK12345678", paysVat=True, bankCode="123", accountNumber="1234567890", billingAddressId=address1.id),
-            Farmer(userId=user2.id, farmName="Emma's Farm", description="We are a small family farm located in the heart of Bratislava. We grow a variety of vegetables and fruits and we are proud to offer our customers the freshest produce.", CIN="12345679", VATIN="12345679", VAT="SK12345679", paysVat=True, bankCode="124", accountNumber="1234567891", billingAddressId=address2.id),
-            Farmer(userId=user3.id, farmName="Sophia's Farm", description="We are a small family farm located in the heart of Brno. We grow a variety of vegetables and fruits and we are proud to offer our customers the freshest produce.", CIN="12345680", VATIN="CZ12345680", VAT="CZ12345678", paysVat=True, bankCode="125", accountNumber="1234567892", billingAddressId=address4.id),
+            Farmer(userId=user1.id, farmName="John's Farm", description="We are a small family farm located in the heart of Bratislava. We grow a variety of vegetables and fruits and we are proud to offer our customers the freshest produce.", CIN="12345678", VATIN="12345678", VAT="SK12345678", paysVat=True, bankCode="123", accountNumber="1234567890", state="Slovenská republika", city="Bratislava", street="Vajnorská", streetNumber="100", zipCode="831 04"),
+            Farmer(userId=user2.id, farmName="Emma's Farm", description="We are a small family farm located in the heart of Bratislava. We grow a variety of vegetables and fruits and we are proud to offer our customers the freshest produce.", CIN="12345679", VATIN="12345679", VAT="SK12345679", paysVat=True, bankCode="124", accountNumber="1234567891", state="Slovenská republika", city="Košice", street="Orlia", streetNumber="1", zipCode="040 01"),
+            Farmer(userId=user3.id, farmName="Sophia's Farm", description="We are a small family farm located in the heart of Brno. We grow a variety of vegetables and fruits and we are proud to offer our customers the freshest produce.", CIN="12345680", VATIN="CZ12345680", VAT="CZ12345678", paysVat=True, bankCode="125", accountNumber="1234567892", state="Česká republika", city="Brno", street="Haškova", streetNumber="1", zipCode="602 00"),
         ])
         session.commit()
 
@@ -223,9 +203,9 @@ def main() -> None:
         farmer2 = session.query(Farmer).filter_by(farmName="Emma's Farm").first()
         farmer3 = session.query(Farmer).filter_by(farmName="Sophia's Farm").first()
         session.add_all([
-            Event(name="Farmers Market", description="Join us at the farmers market to buy fresh produce directly from the farmers.", startDate="2024-10-01", endDate="2024-10-03", createdById=farmer1.id, createdAt="2024-09-01", addressId=address1.id),
-            Event(name="Farmers Market", description="Join us at the farmers market to buy fresh produce directly from the farmers.", startDate="2024-12-01", endDate="2024-12-03", createdById=farmer2.id, createdAt="2024-09-01", addressId=address2.id),
-            Event(name="Farmers Market", description="Join us at the farmers market to buy fresh produce directly from the farmers.", startDate="2025-10-01", endDate="2025-10-03", createdById=farmer3.id, createdAt="2025-09-01", addressId=address4.id),
+            Event(name="Old Farmers Market", description="Join us at the farmers market to buy fresh produce directly from the farmers.", startDate="2024-10-01", endDate="2024-10-03", createdById=farmer1.id, createdAt="2024-09-01", state="Slovenská republika", city="Bratislava", street="Vajnorská", streetNumber="100", zipCode="831 04"),
+            Event(name="New Farmers Market", description="Join us at the farmers market to buy fresh produce directly from the farmers.", startDate="2024-12-01", endDate="2024-12-03", createdById=farmer2.id, createdAt="2024-09-01", state="Slovenská republika", city="Košice", street="Orlia", streetNumber="1", zipCode="040 01"),
+            Event(name="Green Market", description="Join us at the farmers market to buy fresh produce directly from the farmers.", startDate="2025-10-01", endDate="2025-10-03", createdById=farmer3.id, createdAt="2025-09-01", state="Česká republika", city="Brno", street="Haškova", streetNumber="1", zipCode="602 00"),
         ])
         session.commit()
 
@@ -233,9 +213,9 @@ def main() -> None:
         user1 = session.query(User).filter_by(name="James").first()
         user2 = session.query(User).filter_by(name="Olivia").first()
         user3 = session.query(User).filter_by(name="Michael").first()
-        event1 = session.query(Event).filter_by(name="Farmers Market").first()
-        event2 = session.query(Event).filter_by(name="Farmers Market").first()
-        event3 = session.query(Event).filter_by(name="Farmers Market").first()
+        event1 = session.query(Event).filter_by(name="Old Farmers Market").first()
+        event2 = session.query(Event).filter_by(name="New Farmers Market").first()
+        event3 = session.query(Event).filter_by(name="Green Market").first()
         session.add_all([
             UserEventRelation(userId=user1.id, eventId=event1.id),
             UserEventRelation(userId=user2.id, eventId=event2.id),
