@@ -1,6 +1,7 @@
 # library imports
 import sqlalchemy as sa
 from sqlalchemy import URL
+from datetime import datetime
 
 # local imports
 from entities.Product import Product
@@ -162,10 +163,10 @@ def main() -> None:
         farmer1 = session.query(Farmer).filter_by(farmName="John's Farm").first()
         farmer2 = session.query(Farmer).filter_by(farmName="Emma's Farm").first()
         session.add_all([
-            Order(orderNumber="ORD-001", userId=user1.id, farmerId=farmer1.id, createdAt="2021-10-01 10:00", status="ACCEPTED"),
-            Order(orderNumber="ORD-002", userId=user2.id, farmerId=farmer2.id, createdAt="2021-10-02 10:00", status="ACCEPTED"),
-            Order(orderNumber="ORD-003", userId=user3.id, farmerId=farmer1.id, createdAt="2021-10-03 10:00", status="ACCEPTED"),
-            Order(orderNumber="ORD-004", userId=user1.id, farmerId=farmer2.id, createdAt="2021-10-04 10:00", status="ACCEPTED"),
+            Order(orderNumber="ORD-001", userId=user1.id, farmerId=farmer1.id, createdAt=datetime.timestamp(datetime.strptime("2021-10-01 10:00", "%Y-%m-%d %H:%M")), status="ACCEPTED"),
+            Order(orderNumber="ORD-002", userId=user2.id, farmerId=farmer2.id, createdAt=datetime.timestamp(datetime.strptime("2024-10-02 12:30", "%Y-%m-%d %H:%M")), status="ACCEPTED"),
+            Order(orderNumber="ORD-003", userId=user3.id, farmerId=farmer1.id, createdAt=datetime.timestamp(datetime.strptime("2024-10-03 12:30", "%Y-%m-%d %H:%M")), status="ACCEPTED"),
+            Order(orderNumber="ORD-004", userId=user1.id, farmerId=farmer2.id, createdAt=datetime.timestamp(datetime.strptime("2024-10-04 12:30", "%Y-%m-%d %H:%M")), status="ACCEPTED"),
         ])
         session.commit()
 
@@ -203,9 +204,9 @@ def main() -> None:
         farmer2 = session.query(Farmer).filter_by(farmName="Emma's Farm").first()
         farmer3 = session.query(Farmer).filter_by(farmName="Sophia's Farm").first()
         session.add_all([
-            Event(name="Old Farmers Market", description="Join us at the farmers market to buy fresh produce directly from the farmers.", startDate="2024-10-01 12:30", endDate="2024-10-03 20:00", createdById=farmer1.id, createdAt="2024-09-01 11:00", state="Slovenská republika", city="Bratislava", street="Vajnorská", streetNumber="100", zipCode="831 04"),
-            Event(name="New Farmers Market", description="Join us at the farmers market to buy fresh produce directly from the farmers.", startDate="2024-12-01 12:30", endDate="2024-12-03 20:00", createdById=farmer2.id, createdAt="2024-09-01 11:00", state="Slovenská republika", city="Košice", street="Orlia", streetNumber="1", zipCode="040 01"),
-            Event(name="Green Market", description="Join us at the farmers market to buy fresh produce directly from the farmers.", startDate="2025-10-01 12:30", endDate="2025-10-03 20:00", createdById=farmer3.id, createdAt="2025-09-01 11:00", state="Česká republika", city="Brno", street="Haškova", streetNumber="1", zipCode="602 00"),
+            Event(name="Old Farmers Market", description="Join us at the farmers market to buy fresh produce directly from the farmers.", startDate=datetime.timestamp(datetime.strptime("2024-10-01 12:30", "%Y-%m-%d %H:%M")), endDate=datetime.timestamp(datetime.strptime("2024-10-03 20:00", "%Y-%m-%d %H:%M")), createdById=farmer1.id, createdAt=datetime.timestamp(datetime.strptime("2024-09-01 11:00", "%Y-%m-%d %H:%M")), state="Slovenská republika", city="Bratislava", street="Vajnorská", streetNumber="100", zipCode="831 04"),
+            Event(name="New Farmers Market", description="Join us at the farmers market to buy fresh produce directly from the farmers.", startDate=datetime.timestamp(datetime.strptime("2024-12-01 12:30", "%Y-%m-%d %H:%M")), endDate=datetime.timestamp(datetime.strptime("2024-12-03 20:00", "%Y-%m-%d %H:%M")), createdById=farmer2.id, createdAt=datetime.timestamp(datetime.strptime("2024-09-01 11:00", "%Y-%m-%d %H:%M")), state="Slovenská republika", city="Košice", street="Orlia", streetNumber="1", zipCode="040 01"),
+            Event(name="Green Market", description="Join us at the farmers market to buy fresh produce directly from the farmers.", startDate=datetime.timestamp(datetime.strptime("2025-10-01 12:30", "%Y-%m-%d %H:%M")), endDate=datetime.timestamp(datetime.strptime("2025-10-03 20:00", "%Y-%m-%d %H:%M")), createdById=farmer3.id, createdAt=datetime.timestamp(datetime.strptime("2025-09-01 11:00", "%Y-%m-%d %H:%M")), state="Česká republika", city="Brno", street="Haškova", streetNumber="1", zipCode="602 00"),
         ])
         session.commit()
 

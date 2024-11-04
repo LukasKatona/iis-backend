@@ -13,7 +13,7 @@ from entities.Product import Product
 router = APIRouter()
 db = create_engine(DATABASE_URL)
 
-formatted_date = datetime.now().strftime("%Y-%m-%d %H:%M")
+formatted_date = datetime.timestamp(datetime.now())
 
 def generate_order_number() -> str:
     return f"ORD-{int(datetime.now().timestamp())}"
