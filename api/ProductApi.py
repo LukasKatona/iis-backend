@@ -32,7 +32,7 @@ def get_products(
             if nameFilter:
                 filters.append(Product.name == nameFilter)
             if categoryIdFilter:
-                category = session.exec(select(ProductCategory).where(ProductCategory.id == categoryIdFilter)).first()
+                category = session.exec(select(ProductCategory).where(ProductCategory.id == categoryIdFilter)).one()
                 filters.append(Product.categoryId.in_(get_subcategory_ids(category)))
             if farmerIdFilter:
                 filters.append(Product.farmerId == farmerIdFilter)
@@ -59,7 +59,7 @@ def get_subcategory_ids(category: ProductCategory) -> list[int]:
 @router.get("/products/{product_id}", tags=["Products"])
 def get_product_by_id(product_id: int) -> Product:
     with Session(db) as session:
-        return session.exec(select(Product).where(Product.id == product_id)).first()
+        return session.exec(select(Product).where(Product.id == product_id)).one()
     
 @router.post("/products", tags=["Products"])
 def create_product(product: Product) -> Product:

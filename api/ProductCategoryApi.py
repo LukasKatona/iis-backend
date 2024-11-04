@@ -30,7 +30,9 @@ def update_product_category(
 ) -> ProductCategory:
     with Session(db) as session:
         category = session.exec(select(ProductCategory).where(ProductCategory.id == category_id)).one()
-        category.name = category_update.name
+        for key, value in category_update.model_dump().items():
+            if value is not None:
+                setattr(category, key, value)
         session.add(category)
         session.commit()
         session.refresh(category)
