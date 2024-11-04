@@ -91,6 +91,7 @@ def add_product_to_order(user_id: int, product_id: int, quantity: int):
             session.add(relation)
         
         product.stock -= quantity
+        session.add(product)
         session.commit()
         session.refresh(existing_order)
         
@@ -125,7 +126,7 @@ def update_product_in_order(order_id: int, product_id: int, quantity: int):
             if not remaining_products:
                 session.delete(order)
                 session.commit()
-                return Response(status_code=204)
+                return Response(status_code=204, content="Order deleted, because last product was removed.")
                 
 
         session.commit()
@@ -135,27 +136,30 @@ def update_product_in_order(order_id: int, product_id: int, quantity: int):
         return order
 
 @router.delete("/orders/{order_id}", response_model=Order, tags=['Orders'])
-def delete_order(order_id: int):
+def delete_order(order_id: int) -> bool:
     with Session(db) as session:
-        order = session.get(Order, order_id)
+        try:
+            order = session.get(Order, order_id)
       
-        if order.status != OrderStatus.IN_CART:
-            raise HTTPException(status_code=400, detail="Only 'IN_CART' can be deleted.")
-        
-        order_products = session.exec(
-            select(OrderProductRelation).where(OrderProductRelation.orderId == order_id)
-        ).all()
-        
-        for relation in order_products:
-            product = session.get(Product, relation.productId)
-            if product:
-                product.stock += relation.quantity
-            session.delete(relation)
-        session.commit() 
-        session.delete(order)
-        session.commit()
-        
-        return order
+            if order.status != OrderStatus.IN_CART:
+                raise HTTPException(status_code=403, detail="Only 'IN_CART' can be deleted.")
+            
+            order_products = session.exec(
+                select(OrderProductRelation).where(OrderProductRelation.orderId == order_id)
+            ).all()
+            
+            for relation in order_products:
+                product = session.get(Product, relation.productId)
+                if product:
+                    product.stock += relation.quantity
+                    session.add(product)
+                session.delete(relation)
+            session.delete(order)
+            session.commit()
+            return True
+        except Exception as e:
+            session.rollback()
+            return False
 
 @router.delete("/orders/{order_id}/product/{product_id}", response_model=Order, tags=['Orders'])
 def delete_product_from_order(order_id: int, product_id: int):
@@ -174,7 +178,9 @@ def delete_product_from_order(order_id: int, product_id: int):
         if product:
             product.stock += relation.quantity
         
+        session.add(product)
         session.delete(relation)
+        session.commit()
         
         remaining_products = session.exec(
             select(OrderProductRelation).where(OrderProductRelation.orderId == order_id)
@@ -182,6 +188,7 @@ def delete_product_from_order(order_id: int, product_id: int):
         
         if not remaining_products:
             session.delete(order)
+            return Response(status_code=204, content="Order deleted, because last product was removed.")
         
         session.commit()
         session.refresh(order)
