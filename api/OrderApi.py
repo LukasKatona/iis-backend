@@ -22,13 +22,14 @@ def generate_order_number() -> str:
 def get_orders(user_id: Optional[int] = None, farmer_id: Optional[int] = None, status: Optional[OrderStatus] = None) -> List[Order]:
     with Session(db) as session:
         query = select(Order)
+        filters = []
         
-        if user_id is not None:
-            query = query.where(Order.userId == user_id)
-        if farmer_id is not None:
-            query = query.where(Order.farmerId == farmer_id)
-        if status is not None:
-            query = query.where(Order.status == status)
+        if user_id:
+            filters.append(Order.userId == user_id)
+        if farmer_id:
+            filters.append(Order.farmerId == farmer_id)
+        if status:
+            filters.append(Order.status == status)
         
         return session.exec(query).all()
 

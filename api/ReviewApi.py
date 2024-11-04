@@ -52,13 +52,14 @@ def create_review_for_order(userId: int, orderId: int, rating: int, review: Opti
         return new_review
     
 @router.post("/reviews/product/{product_id}", response_model=Review, tags=["Reviews"])
-def create_review_for_product(userId: int, productId: int, rating: int, review: Optional[str] = None) -> Review:
+def create_review_for_product(userId: int, orderId: int, productId: int, rating: int, review: Optional[str] = None) -> Review:
     if rating < 1 or rating > 5:
         raise HTTPException(status_code=400, detail="Rating must be between 1 and 5.")
-
+    
     with Session(db) as session:
         new_review = Review(
             userId=userId,
+            orderId=orderId,
             productId=productId,
             rating=rating,
             review=review,
@@ -70,27 +71,19 @@ def create_review_for_product(userId: int, productId: int, rating: int, review: 
         session.refresh(new_review)
         return new_review
 
-@router.delete("/reviews/{review_id}/product/{product_id}", response_model=Review, tags=["Reviews"])
-def delete_review_from_product(review_id: int) -> Review:
+@router.delete("/reviews/{review_id}", response_model=Review, tags=["Reviews"])
+def delete_review(review_id: int, product_id: Optional[int] = None, order_id: Optional[int] = None) -> bool:
     with Session(db) as session:
-        review = session.exec(select(Review).where(Review.id == review_id)).first()
+        try:        
+            review = session.exec(select(Review).where(Review.id == review_id)).one()
+            
+            if not review:
+                raise HTTPException(status_code=404, detail="Review not found.")
+            
+            session.delete(review)
+            session.commit()
+            return True
+        except:
+            session.rollback()
+            return False
         
-        if not review:
-            raise HTTPException(status_code=404, detail="Review not found.")
-        session.delete(review)
-        session.commit()
-        
-        return review
-    
-@router.delete("/reviews/{review_id}/order/{order_id}", response_model=Review, tags=["Reviews"])
-def delete_review_from_product(review_id: int) -> Review:
-    with Session(db) as session:
-        review = session.exec(select(Review).where(Review.id == review_id)).first()
-        
-        if not review:
-            raise HTTPException(status_code=404, detail="Review not found.")
-        session.delete(review)
-        session.commit()
-        
-        return review
-
