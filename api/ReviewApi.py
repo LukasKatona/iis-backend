@@ -32,8 +32,8 @@ def get_reviews(userIdFilter: Optional[int] = Query(None), productIdFilter: Opti
         
         return session.exec(query).all()
 
-@router.post("/orders/{order_id}/add-review", response_model=Review, tags=["Reviews"])
-def create_review(userId: int, orderId: int, rating: int, review: Optional[str] = None) -> Review:
+@router.post("/reviews/order/{order_id}", response_model=Review, tags=["Reviews"])
+def create_review_for_order(userId: int, orderId: int, rating: int, review: Optional[str] = None) -> Review:
     if rating < 1 or rating > 5:
         raise HTTPException(status_code=400, detail="Rating must be between 1 and 5.")
 
@@ -51,8 +51,8 @@ def create_review(userId: int, orderId: int, rating: int, review: Optional[str] 
         session.refresh(new_review)
         return new_review
     
-@router.post("/products/{product_id}/add-review", response_model=Review, tags=["Reviews"])
-def create_review(userId: int, productId: int, rating: int, review: Optional[str] = None) -> Review:
+@router.post("/reviews/product/{product_id}", response_model=Review, tags=["Reviews"])
+def create_review_for_product(userId: int, productId: int, rating: int, review: Optional[str] = None) -> Review:
     if rating < 1 or rating > 5:
         raise HTTPException(status_code=400, detail="Rating must be between 1 and 5.")
 
@@ -70,8 +70,8 @@ def create_review(userId: int, productId: int, rating: int, review: Optional[str
         session.refresh(new_review)
         return new_review
 
-@router.delete("/products/{product_id}/review/{review_id}", response_model=Review, tags=["Reviews"])
-def delete_review(review_id: int) -> Review:
+@router.delete("/reviews/{review_id}/product/{product_id}", response_model=Review, tags=["Reviews"])
+def delete_review_from_product(review_id: int) -> Review:
     with Session(db) as session:
         review = session.exec(select(Review).where(Review.id == review_id)).first()
         
@@ -82,8 +82,8 @@ def delete_review(review_id: int) -> Review:
         
         return review
     
-@router.delete("/orders/{order_id}/review/{review_id}", response_model=Review, tags=["Reviews"])
-def delete_review(review_id: int) -> Review:
+@router.delete("/reviews/{review_id}/order/{order_id}", response_model=Review, tags=["Reviews"])
+def delete_review_from_product(review_id: int) -> Review:
     with Session(db) as session:
         review = session.exec(select(Review).where(Review.id == review_id)).first()
         
