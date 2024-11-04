@@ -62,7 +62,7 @@ def update_user(user_id: int, user_update: UserUpdate) -> User:
         user = session.exec(select(User).where(User.id == user_id)).one()
         
         for key, value in user_update.model_dump().items():
-            if value is not None:
+            if key != "role" and value is not None:
                 setattr(user, key, value)
         
         if isinstance(user.role, str):
@@ -72,8 +72,22 @@ def update_user(user_id: int, user_update: UserUpdate) -> User:
         session.refresh(user)
         return user
     
+@router.patch("/users/{user_id}", tags=["Users"])
+def update_user_role(user_id: int, user_role: str) -> User:
+    with Session(db) as session:
+        user = session.exec(select(User).where(User.id == user_id)).one()
+        
+        user.role = user_role
+
+        if isinstance(user.role, str):
+            user.role = Role.strToEnum(user.role)
+
+        session.commit()
+        session.refresh(user)
+        return user
+    
 @router.patch("/users/{user_id}/password", tags=["Users"])
-def change_password(
+def change_user_password(
     user_id: int,
     old_password: str,
     new_password: str

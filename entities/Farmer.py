@@ -47,3 +47,4 @@ class FarmerUpdate(SQLModel):
     city: Optional[str] = None
     street: Optional[str] = None
     streetNumber: Optional[str] = None
+    zipCode: Optional[str] = None
