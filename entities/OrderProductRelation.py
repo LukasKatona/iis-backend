@@ -10,7 +10,7 @@ class OrderProductRelation(SQLModel, table=True):
     quantity: int
 
     __table_args__ = (
-        ForeignKeyConstraint(["orderId"], ["orders.id"], name="order_product_relations_orderId_fkey"),
-        ForeignKeyConstraint(["productId"], ["products.id"], name="order_product_relations_ProductId_fkey"),
+        ForeignKeyConstraint(["orderId"], ["orders.id"], name="order_product_relations_orderId_fkey", ondelete="CASCADE"),
+        ForeignKeyConstraint(["productId"], ["products.id"], name="order_product_relations_ProductId_fkey", ondelete="CASCADE"),
     )
     

@@ -1,4 +1,5 @@
 # library imports
+from typing import Optional
 from sqlalchemy import ForeignKeyConstraint
 from sqlmodel import Field, SQLModel
 
@@ -16,10 +17,27 @@ class User(SQLModel, table=True):
     password: str
     phone: str = Field(nullable=True)
     imageUrl: str = Field(nullable=True)
-    addressId: int = Field(default=None, nullable=True)
+    
+    state: str = Field(nullable=True)
+    city: str = Field(nullable=True)
+    street: str = Field(nullable=True)
+    streetNumber: str = Field(nullable=True)
+    zipCode: str = Field(nullable=True)
 
     __table_args__ = (
-        ForeignKeyConstraint(["farmerId"], ["farmers.id"], name="users_farmerId_fkey"),
-        ForeignKeyConstraint(["addressId"], ["addresses.id"], name="users_addressId_fkey"),
+        ForeignKeyConstraint(["farmerId"], ["farmers.id"], name="users_farmerId_fkey", ondelete="SET NULL"),
     )
+
+class UserUpdate(SQLModel):
+    name: Optional[str] = None
+    surname: Optional[str] = None
+    email: Optional[str] = None
+    phone: Optional[str] = None
+    imageUrl: Optional[str] = None
+
+    state: Optional[str] = None
+    city: Optional[str] = None
+    street: Optional[str] = None
+    streetNumber: Optional[str] = None
+    zipCode: Optional[str] = None
     

@@ -12,7 +12,7 @@ class Review(SQLModel, table=True):
     createdAt: str
 
     __table_args__ = (
-        ForeignKeyConstraint(["userId"], ["users.id"], name="reviews_userId_fkey"),
-        ForeignKeyConstraint(["productId"], ["products.id"], name="reviews_productId_fkey"),
-        ForeignKeyConstraint(["orderId"], ["orders.id"], name="reviews_orderId_fkey"),
+        ForeignKeyConstraint(["userId"], ["users.id"], name="reviews_userId_fkey", ondelete="CASCADE"),
+        ForeignKeyConstraint(["productId"], ["products.id"], name="reviews_productId_fkey", ondelete="CASCADE"),
+        ForeignKeyConstraint(["orderId"], ["orders.id"], name="reviews_orderId_fkey", ondelete="CASCADE"),
     )

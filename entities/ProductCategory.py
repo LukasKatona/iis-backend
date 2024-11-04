@@ -10,3 +10,6 @@ class ProductCategory(SQLModel, table=True):
 
     parentCategory: Optional["ProductCategory"] = Relationship(back_populates="childCategories", sa_relationship_kwargs={"remote_side": "ProductCategory.id"})
     childCategories: list["ProductCategory"] = Relationship(back_populates="parentCategory")
+
+class ProductCategoryUpdate(SQLModel):
+    name: str

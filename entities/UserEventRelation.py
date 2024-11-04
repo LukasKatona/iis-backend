@@ -9,7 +9,7 @@ class UserEventRelation(SQLModel, table=True):
     eventId: int = Field(default=None, index=True)
 
     __table_args__ = (
-        ForeignKeyConstraint(["userId"], ["users.id"], name="user_event_relations_userId_fkey"),
-        ForeignKeyConstraint(["eventId"], ["events.id"], name="user_event_relations_eventId_fkey"),
+        ForeignKeyConstraint(["userId"], ["users.id"], name="user_event_relations_userId_fkey", ondelete="CASCADE"),
+        ForeignKeyConstraint(["eventId"], ["events.id"], name="user_event_relations_eventId_fkey", ondelete="CASCADE"),
     )
     
