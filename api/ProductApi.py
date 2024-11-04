@@ -6,6 +6,7 @@ from sqlmodel import Session, create_engine, select
 from enums.Unit import Unit
 
 # local imports
+from entities.Farmer import Farmer
 from entities.ProductCategory import ProductCategory
 from entities.Product import Product, ProductUpdate
 from constants.databaseURL import DATABASE_URL
