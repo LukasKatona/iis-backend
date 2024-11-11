@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 # local imports
-from api import ProductCategoryApi, ProductApi, EventApi, UserApi, FarmerApi
+from api import ProductCategoryApi, ProductApi, EventApi, UserApi, FarmerApi, ReviewApi, OrderApi, NewCategoryRequestApi
 
 app = FastAPI()
 
@@ -22,3 +22,6 @@ app.include_router(ProductApi.router)
 app.include_router(EventApi.router)
 app.include_router(UserApi.router)
 app.include_router(FarmerApi.router)
+app.include_router(ReviewApi.router)
+app.include_router(OrderApi.router)
+app.include_router(NewCategoryRequestApi.router)

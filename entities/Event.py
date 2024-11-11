@@ -8,10 +8,10 @@ class Event(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
     name: str
     description: str
-    startDate: str
-    endDate: str
+    startDate: float
+    endDate: float
     createdById: int = Field(default=None, index=True)
-    createdAt: str
+    createdAt: float
 
     state: str = Field(nullable=True)
     city: str = Field(nullable=True)
@@ -26,8 +26,8 @@ class Event(SQLModel, table=True):
 class EventUpdate(SQLModel):
     name: Optional[str] = None
     description: Optional[str] = None
-    startDate: Optional[str] = None
-    endDate: Optional[str] = None
+    startDate: Optional[float] = None
+    endDate: Optional[float] = None
 
     state: Optional[str] = None
     city: Optional[str] = None

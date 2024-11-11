@@ -11,9 +11,9 @@ class Order(SQLModel, table=True):
     farmerId: int = Field(default=None, index=True, nullable=True)
     reviewId: int = Field(default=None, nullable=True)
     status: OrderStatus = Field(default=OrderStatus.IN_CART)
-    createdAt: str
-    updatedAt: str = Field(nullable=True)
-    suppliedAt: str = Field(nullable=True)
+    createdAt: float
+    updatedAt: float = Field(nullable=True)
+    suppliedAt: float = Field(nullable=True)
 
     __table_args__ = (
         ForeignKeyConstraint(["userId"], ["users.id"], name="orders_userId_fkey", ondelete="SET NULL"),
