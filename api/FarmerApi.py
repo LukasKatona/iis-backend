@@ -1,5 +1,5 @@
 # library imports
-from typing import Optional
+from typing import Optional, Union
 from fastapi import APIRouter, HTTPException, Query
 from sqlalchemy import and_, or_
 from sqlmodel import Session, create_engine, select
@@ -41,9 +41,9 @@ def get_farmer_by_id(farmer_id: int) -> Farmer:
         return session.exec(select(Farmer).where(Farmer.id == farmer_id)).one()
     
 @router.get("/farmers/{user_id}/by-user-id", tags=["Farmers"])
-def get_farmer_by_user_id(user_id: int) -> Farmer:
+def get_farmer_by_user_id(user_id: int) -> Union[Farmer, None]:
     with Session(db) as session:
-        return session.exec(select(Farmer).where(Farmer.userId == user_id)).one()
+        return session.exec(select(Farmer).where(Farmer.userId == user_id)).first()
     
 @router.post("/farmers", tags=["Farmers"])
 def create_farmer(farmer: Farmer) -> Farmer:
