@@ -1,4 +1,5 @@
 # library imports
+import time
 from typing import Optional
 from fastapi import APIRouter, Query
 from sqlalchemy import and_
@@ -52,6 +53,7 @@ def get_events_by_user(user_id: int) -> list[Event]:
 @router.post("/events", tags=["Events"])
 def create_event(event: Event) -> Event:
     with Session(db) as session:
+        event.createdAt = time.time()
         session.add(event)
         session.commit()
         session.refresh(event)
