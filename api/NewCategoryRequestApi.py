@@ -39,10 +39,10 @@ def create_category_request(new_request: NewCategoryRequest) -> NewCategoryReque
         return new_request
 
 @router.patch("/category-request/{category_id}/status", response_model=NewCategoryRequest, tags=["Category Requests"])
-def update_category_request_status(category_id: int, new_state: CategoryRequestState) -> NewCategoryRequest:
+def update_category_request_status(category_id: int, new_state: str) -> NewCategoryRequest:
     with Session(db) as session:
         category_request = session.get(NewCategoryRequest, category_id)
-        category_request.state = new_state
+        category_request.state = CategoryRequestState.strToEnum(new_state)
         session.commit() 
         session.refresh(category_request)
         return category_request
