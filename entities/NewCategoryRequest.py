@@ -15,3 +15,6 @@ class NewCategoryRequest(SQLModel, table=True):
         ForeignKeyConstraint(["parentCategoryId"], ["product_categories.id"], name="newcategoryrequest_parentCategoryId_fkey", ondelete="CASCADE"),
         ForeignKeyConstraint(["createdById"], ["users.id"], name="newcategoryrequest_createdById_fkey", ondelete="SET NULL"),
     )
+
+class NewCategoryRequestUpdate(SQLModel):
+    state: CategoryRequestState

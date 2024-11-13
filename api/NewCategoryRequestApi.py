@@ -3,7 +3,7 @@ from typing import List, Optional
 from sqlmodel import Session, create_engine, select
 from sqlalchemy import and_
 
-from entities.NewCategoryRequest import NewCategoryRequest
+from entities.NewCategoryRequest import NewCategoryRequest, NewCategoryRequestUpdate
 from enums.CategoryRequestState import CategoryRequestState
 from constants.databaseURL import DATABASE_URL
 
@@ -32,17 +32,22 @@ def get_category_requests(user_id: Optional[int] = Query(None), status: Optional
 
 @router.post("/category-request", response_model=NewCategoryRequest, tags=["Category Requests"])
 def create_category_request(new_request: NewCategoryRequest) -> NewCategoryRequest:
-    with Session(db) as session:      
+    with Session(db) as session:
+        if isinstance(new_request.state, str):
+            new_request.state = CategoryRequestState.strToEnum(new_request.state)     
         session.add(new_request)
         session.commit()
         session.refresh(new_request)
         return new_request
 
-@router.patch("/category-request/{category_id}/status", response_model=NewCategoryRequest, tags=["Category Requests"])
-def update_category_request_status(category_id: int, new_state: str) -> NewCategoryRequest:
+@router.patch("/category-request/{category_id}", tags=["Category Requests"])
+def update_category_request(category_id: int, new_category_request_update: NewCategoryRequestUpdate) -> NewCategoryRequest:
     with Session(db) as session:
         category_request = session.get(NewCategoryRequest, category_id)
-        category_request.state = CategoryRequestState.strToEnum(new_state)
+        if isinstance(new_category_request_update.state, str):
+            category_request.state = CategoryRequestState.strToEnum(new_category_request_update.state)
+        else:
+            category_request.state = new_category_request_update.state
         session.commit() 
         session.refresh(category_request)
         return category_request
