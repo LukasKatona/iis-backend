@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 # local imports
 from api import ProductCategoryApi, ProductApi, EventApi, UserApi, FarmerApi, ReviewApi, OrderApi, NewCategoryRequestApi
 from enums.Role import Role
+import auth
 
 app = FastAPI()
 
@@ -19,6 +20,7 @@ app.add_middleware(
 )
 
 # Include routers
+app.include_router(auth.router)
 app.include_router(ProductCategoryApi.router)
 app.include_router(ProductApi.router)
 app.include_router(EventApi.router)
