@@ -72,7 +72,7 @@ def update_user(user_id: int, user_update: UserUpdate) -> User:
         session.refresh(user)
         return user
     
-@router.patch("/users/{user_id}", tags=["Users"])
+@router.patch("/users/{user_id}/update-role", tags=["Users"])
 def update_user_role(user_id: int, user_role: str) -> User:
     with Session(db) as session:
         user = session.exec(select(User).where(User.id == user_id)).one()
