@@ -20,6 +20,9 @@ class Order(SQLModel, table=True):
         ForeignKeyConstraint(["farmerId"], ["farmers.id"], name="orders_farmerId_fkey", ondelete="SET NULL"),
         ForeignKeyConstraint(["reviewId"], ["reviews.id"], name="orders_reviewId_fkey", ondelete="SET NULL"),
     )
+    
+class OrderUpdate(SQLModel):
+    status: OrderStatus
 
 
     

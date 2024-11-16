@@ -5,7 +5,7 @@ from datetime import datetime
 from constants.databaseURL import DATABASE_URL
 
 from enums.OrderStatus import OrderStatus
-from entities.Order import Order
+from entities.Order import Order, OrderUpdate
 from entities.Farmer import Farmer
 from entities.OrderProductRelation import OrderProductRelation
 from entities.Product import Product
@@ -30,26 +30,32 @@ def get_orders(user_id: Optional[int] = None, farmer_id: Optional[int] = None, s
             filters.append(Order.farmerId == farmer_id)
         if status:
             filters.append(Order.status == status)
+            
+        if filters:
+            query = query.where(*filters)
         
         return session.exec(query).all()
 
 
-@router.patch("/orders/{order_id}/status", response_model=Order, tags=['Orders'])
-def update_order_status(order_id: int, new_status: OrderStatus):
+@router.patch("/orders/{order_id}/status", tags=['Orders'])
+def update_order_status(order_id: int, new_status_update: OrderUpdate) -> Order:
     with Session(db) as session:
         order = session.get(Order, order_id)
-        if not order:
-            raise HTTPException(status_code=404, detail="Order not found.")
+       
+        if isinstance(new_status_update.status, str):
+            new_status_update = OrderStatus.strToEnum(new_status_update.status)
+
+
+        order.status = new_status_update.status
         
-        order.status = new_status
-        order.updatedAt = formatted_date
-        
-        if new_status == OrderStatus.ACCEPTED:
+        if new_status_update.status == OrderStatus.ACCEPTED:
             order.suppliedAt = formatted_date
-        
+            
         session.commit()
         session.refresh(order)
+
         return order
+
 
 @router.post("/orders/add-product", response_model=Order, tags=['Orders'])
 def add_product_to_order(user_id: int, product_id: int, quantity: int):
@@ -195,3 +201,21 @@ def delete_product_from_order(order_id: int, product_id: int):
         session.refresh(order)
         
         return order
+    
+@router.get("/orders/{order_id}/products", response_model=List[Product], tags=["Orders"])
+def get_products_of_order(order_id: int):
+    with Session(db) as session:
+        relations = session.exec(
+            select(OrderProductRelation).where(OrderProductRelation.orderId == order_id)
+        ).all()
+        
+        product_ids = [relation.productId for relation in relations]
+        products = session.exec(
+            select(Product).where(Product.id.in_(product_ids))
+        ).all()
+        
+        for relation in relations:
+            product = next((p for p in products if p.id == relation.productId), None)
+            if product:
+                product.stock = relation.quantity
+        return products
