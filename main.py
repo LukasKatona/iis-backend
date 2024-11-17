@@ -32,6 +32,7 @@ app.include_router(NewCategoryRequestApi.router)
 
 admin_api_list = [
     ("GET", "/users"),
+    ("GET", "/users/{user_id}"),
     ("POST", "/users"),
     ("PATCH", "/users/{user_id}/update-role"),
     ("DELETE", "/users/{user_id}"),
@@ -79,7 +80,7 @@ user_api_list = [
     ("POST", "/events/{event_id}/join/{user_id}"),
     ("DELETE", "/events/{event_id}/leave/{user_id}"),
 
-    ("GET", "/users/{user_id}"),
+    ("GET", "/users/me"),
     ("PATCH", "/users/{user_id}"),
     ("PATCH", "/users/{user_id}/password"),
 
@@ -113,6 +114,5 @@ def get_access_level(request: Request) -> Union[Role, None]:
 
 @app.middleware("http")
 async def process_requests(request: Request, call_next):
-    print(get_access_level(request))
     response = await call_next(request)
     return response

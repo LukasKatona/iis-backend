@@ -10,7 +10,7 @@ class User(SQLModel, table=True):
     __tablename__ = 'users'
     id: int = Field(default=None, primary_key=True)
     farmerId: int = Field(default=None, nullable=True)
-    role: Role = Field(default=Role.GUEST)
+    role: Role = Field(default=Role.CUSTOMER)
     name: str
     surname: str
     email: str

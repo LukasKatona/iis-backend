@@ -1,10 +1,11 @@
 # library imports
-from typing import Optional
-from fastapi import APIRouter, HTTPException, Query
+from typing import Annotated, Optional
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import and_, or_
 from sqlmodel import Session, create_engine, select
 
 # local imports
+from auth import get_current_user
 from entities.User import User, UserUpdate
 from enums.Role import Role
 from constants.databaseURL import DATABASE_URL
@@ -40,6 +41,12 @@ def get_users(
                 query = query.order_by(sortField.desc())
             
         return session.exec(query).all()
+    
+@router.get("/users/me", tags=["Users"])
+def get_logged_in_user(
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> User:
+    return current_user
 
 @router.get("/users/{user_id}", tags=["Users"])
 def get_user_by_id(user_id: int) -> User:
