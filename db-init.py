@@ -82,8 +82,11 @@ def main() -> None:
         farmer2 = session.query(Farmer).filter_by(farmName="Emma's Farm").first()
         farmer3 = session.query(Farmer).filter_by(farmName="Sophia's Farm").first()
         user1.farmerId = farmer1.id
+        user1.isFarmer = True
         user2.farmerId = farmer2.id
+        user2.isFarmer = True
         user3.farmerId = farmer3.id
+        user3.isFarmer = True
         session.add_all([user1, user2, user3])
         session.commit()
 

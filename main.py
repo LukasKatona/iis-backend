@@ -13,10 +13,10 @@ app = FastAPI()
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Adjust as needed, "*" allows all origins
+    allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["*"],  # Adjust allowed methods (GET, POST, etc.)
-    allow_headers=["*"],  # Adjust allowed headers
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Include routers

@@ -7,7 +7,6 @@ from sqlmodel import Session, create_engine, select
 # local imports
 from auth import get_current_user
 from entities.User import User, UserUpdate
-from enums.Role import Role
 from constants.databaseURL import DATABASE_URL
 
 router = APIRouter()
@@ -30,7 +29,14 @@ def get_users(
             if nameFilter:
                 filters.append(or_(User.name == nameFilter, User.surname == nameFilter))
             if roleFilter:
-                filters.append(User.role == Role.strToEnum(roleFilter))
+                if roleFilter == "admin":
+                    filters.append(User.isAdmin == True)
+                elif roleFilter == "moderator":
+                    filters.append(User.isModerator == True)
+                elif roleFilter == "farmer":
+                    filters.append(User.isFarmer == True)
+                elif roleFilter == "customer":
+                    filters.append(and_(User.isAdmin == False, User.isModerator == False, User.isFarmer == False))
             query = query.where(and_(*filters))
         
         # apply sorting
@@ -56,8 +62,6 @@ def get_user_by_id(user_id: int) -> User:
 @router.post("/users", tags=["Users"])
 def create_user(user: User) -> User:
     with Session(db) as session:
-        if isinstance(user.role, str):
-            user.role = Role.strToEnum(user.role)
         session.add(user)
         session.commit()
         session.refresh(user)
@@ -70,25 +74,6 @@ def update_user(user_id: int, user_update: UserUpdate) -> User:
         
         for key, value in user_update.model_dump().items():
             setattr(user, key, value)
-                
-        if isinstance(user.role, str):
-            user.role = Role.strToEnum(user.role)
-
-        print(user)
-
-        session.commit()
-        session.refresh(user)
-        return user
-    
-@router.patch("/users/{user_id}/update-role", tags=["Users"])
-def update_user_role(user_id: int, user_role: str) -> User:
-    with Session(db) as session:
-        user = session.exec(select(User).where(User.id == user_id)).one()
-        
-        user.role = user_role
-
-        if isinstance(user.role, str):
-            user.role = Role.strToEnum(user.role)
 
         session.commit()
         session.refresh(user)
@@ -116,7 +101,7 @@ def delete_user(user_id: int) -> bool:
     with Session(db) as session:
         try:
             user = session.exec(select(User).where(User.id == user_id)).one()
-            if user.role == Role.ADMIN:
+            if user.isAdmin:
                 raise HTTPException(status_code=403, detail="Admin user cannot be deleted.")
             session.delete(user)
             session.commit()
