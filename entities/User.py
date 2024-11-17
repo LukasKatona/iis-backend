@@ -35,6 +35,9 @@ class UserUpdate(SQLModel):
     phone: Optional[str] = None
     imageUrl: Optional[str] = None
 
+    farmerId: Optional[int] = None
+    role: Optional[Role] = None
+
     state: Optional[str] = None
     city: Optional[str] = None
     street: Optional[str] = None

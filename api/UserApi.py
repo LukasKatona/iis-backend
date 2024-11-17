@@ -69,11 +69,12 @@ def update_user(user_id: int, user_update: UserUpdate) -> User:
         user = session.exec(select(User).where(User.id == user_id)).one()
         
         for key, value in user_update.model_dump().items():
-            if key != "role" and value is not None:
-                setattr(user, key, value)
-        
+            setattr(user, key, value)
+                
         if isinstance(user.role, str):
             user.role = Role.strToEnum(user.role)
+
+        print(user)
 
         session.commit()
         session.refresh(user)
