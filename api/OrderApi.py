@@ -7,7 +7,7 @@ from constants.databaseURL import DATABASE_URL
 from enums.OrderStatus import OrderStatus
 from entities.Order import Order, OrderUpdate
 from entities.Farmer import Farmer
-from entities.OrderProductRelation import OrderProductRelation
+from entities.OrderProductRelation import OrderProductRelation, OrderProductRelationUpdate
 from entities.Product import Product
 
 router = APIRouter()
@@ -105,24 +105,24 @@ def add_product_to_order(user_id: int, product_id: int, quantity: int):
         return existing_order
 
 @router.patch("/orders/{order_id}/edit-product", response_model=Order, tags=['Orders'])
-def update_product_in_order(order_id: int, product_id: int, quantity: int):
+def update_product_in_order(order_id: int, product_update: OrderProductRelationUpdate):
     with Session(db) as session:
         order = session.get(Order, order_id)
-        product = session.get(Product, product_id)
+        product = session.get(Product, product_update.productId)
         
         relation = session.exec(
             select(OrderProductRelation)
-            .where(OrderProductRelation.orderId == order_id, OrderProductRelation.productId == product_id)
+            .where(OrderProductRelation.orderId == order_id, OrderProductRelation.productId == product_update.productId)
         ).first()
 
-        if product.stock < quantity:
+        if product.stock < product_update.quantity:
             raise HTTPException(status_code=400, detail="Not enough stock available")
 
         current_quantity = relation.quantity
-        relation.quantity = quantity
-        product.stock = product.stock - (quantity - current_quantity)
+        relation.quantity = product_update.quantity	
+        product.stock = product.stock - (product_update.quantity - current_quantity)
 
-        if quantity == 0:
+        if product_update.quantity == 0:
             session.delete(relation)
             session.commit()
 
