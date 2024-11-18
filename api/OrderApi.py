@@ -19,7 +19,7 @@ def generate_order_number() -> str:
     return f"ORD-{int(datetime.now().timestamp())}"
 
 @router.get("/orders", response_model=List[Order], tags=['Orders'])
-def get_orders(user_id: Optional[int] = None, farmer_id: Optional[int] = None, status: Optional[OrderStatus] = None) -> List[Order]:
+def get_orders(user_id: Optional[int] = None, farmer_id: Optional[int] = None, status: Optional[OrderStatus] = None, exclude_status: Optional[OrderStatus] = None) -> List[Order]:
     with Session(db) as session:
         query = select(Order)
         filters = []
@@ -30,6 +30,8 @@ def get_orders(user_id: Optional[int] = None, farmer_id: Optional[int] = None, s
             filters.append(Order.farmerId == farmer_id)
         if status:
             filters.append(Order.status == status)
+        if exclude_status: 
+            filters.append(Order.status != exclude_status)
             
         if filters:
             query = query.where(*filters)
@@ -47,9 +49,13 @@ def update_order_status(order_id: int, new_status_update: OrderUpdate) -> Order:
 
 
         order.status = new_status_update.status
+        order.updatedAt = formatted_date
         
-        if new_status_update.status == OrderStatus.ACCEPTED:
+        if new_status_update.status == OrderStatus.SUPPLIED:
             order.suppliedAt = formatted_date
+        
+            
+        
             
         session.commit()
         session.refresh(order)
@@ -59,7 +65,7 @@ def update_order_status(order_id: int, new_status_update: OrderUpdate) -> Order:
 
 @router.post("/orders/add-product", response_model=Order, tags=['Orders'])
 def add_product_to_order(user_id: int, product_id: int, quantity: int):
-    
+    print(user_id, product_id, quantity)
     with Session(db) as session:
         product = session.get(Product, product_id)
         if not product:
