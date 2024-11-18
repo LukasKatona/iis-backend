@@ -3,14 +3,14 @@ from typing import Optional
 from sqlalchemy import ForeignKeyConstraint
 from sqlmodel import Field, SQLModel
 
-# local imports
-from enums.Role import Role
-
 class User(SQLModel, table=True):
     __tablename__ = 'users'
     id: int = Field(default=None, primary_key=True)
     farmerId: int = Field(default=None, nullable=True)
-    role: Role = Field(default=Role.GUEST)
+    isAdmin: bool = Field(default=False)
+    isModerator: bool = Field(default=False)
+    isFarmer: bool = Field(default=False)
+
     name: str
     surname: str
     email: str
@@ -29,6 +29,10 @@ class User(SQLModel, table=True):
     )
 
 class UserUpdate(SQLModel):
+    farmerId: Optional[int] = None
+    isModerator: Optional[bool] = None
+    isFarmer: Optional[bool] = None
+
     name: Optional[str] = None
     surname: Optional[str] = None
     email: Optional[str] = None

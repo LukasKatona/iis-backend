@@ -30,7 +30,7 @@ def get_category_requests(user_id: Optional[int] = Query(None), status: Optional
         return category_requests
 
 
-@router.post("/category-request", response_model=NewCategoryRequest, tags=["Category Requests"])
+@router.post("/category-requests", response_model=NewCategoryRequest, tags=["Category Requests"])
 def create_category_request(new_request: NewCategoryRequest) -> NewCategoryRequest:
     with Session(db) as session:
         if isinstance(new_request.state, str):
@@ -40,7 +40,7 @@ def create_category_request(new_request: NewCategoryRequest) -> NewCategoryReque
         session.refresh(new_request)
         return new_request
 
-@router.patch("/category-request/{category_id}", tags=["Category Requests"])
+@router.patch("/category-requests/{category_id}", tags=["Category Requests"])
 def update_category_request(category_id: int, new_category_request_update: NewCategoryRequestUpdate) -> NewCategoryRequest:
     with Session(db) as session:
         category_request = session.get(NewCategoryRequest, category_id)
@@ -52,7 +52,7 @@ def update_category_request(category_id: int, new_category_request_update: NewCa
         session.refresh(category_request)
         return category_request
     
-@router.delete("/category-request/{category_id}", response_model=NewCategoryRequest, tags=["Category Requests"])
+@router.delete("/category-requests/{category_id}", response_model=NewCategoryRequest, tags=["Category Requests"])
 def delete_category_request(category_id: int) -> bool:
     with Session(db) as session:
         try:
