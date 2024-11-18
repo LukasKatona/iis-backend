@@ -5,10 +5,10 @@ from datetime import datetime
 from constants.databaseURL import DATABASE_URL
 
 from enums.OrderStatus import OrderStatus
-from entities.Order import Order
+from entities.Order import Order, OrderUpdate
 from entities.Farmer import Farmer
-from entities.OrderProductRelation import OrderProductRelation
-from entities.Product import Product
+from entities.OrderProductRelation import OrderProductRelation, OrderProductRelationUpdate
+from entities.Product import Product, ProductWithQuantity
 
 router = APIRouter()
 db = create_engine(DATABASE_URL)
@@ -19,7 +19,7 @@ def generate_order_number() -> str:
     return f"ORD-{int(datetime.now().timestamp())}"
 
 @router.get("/orders", response_model=List[Order], tags=['Orders'])
-def get_orders(user_id: Optional[int] = None, farmer_id: Optional[int] = None, status: Optional[OrderStatus] = None) -> List[Order]:
+def get_orders(user_id: Optional[int] = None, farmer_id: Optional[int] = None, status: Optional[OrderStatus] = None, exclude_status: Optional[OrderStatus] = None) -> List[Order]:
     with Session(db) as session:
         query = select(Order)
         filters = []
@@ -30,30 +30,41 @@ def get_orders(user_id: Optional[int] = None, farmer_id: Optional[int] = None, s
             filters.append(Order.farmerId == farmer_id)
         if status:
             filters.append(Order.status == status)
+        if exclude_status: 
+            filters.append(Order.status != exclude_status)
+            
+        if filters:
+            query = query.where(*filters)
         
         return session.exec(query).all()
 
 
-@router.patch("/orders/{order_id}/status", response_model=Order, tags=['Orders'])
-def update_order_status(order_id: int, new_status: OrderStatus):
+@router.patch("/orders/{order_id}/status", tags=['Orders'])
+def update_order_status(order_id: int, new_status_update: OrderUpdate) -> Order:
     with Session(db) as session:
         order = session.get(Order, order_id)
-        if not order:
-            raise HTTPException(status_code=404, detail="Order not found.")
-        
-        order.status = new_status
+       
+        if isinstance(new_status_update.status, str):
+            new_status_update = OrderStatus.strToEnum(new_status_update.status)
+
+
+        order.status = new_status_update.status
         order.updatedAt = formatted_date
         
-        if new_status == OrderStatus.ACCEPTED:
+        if new_status_update.status == OrderStatus.SUPPLIED:
             order.suppliedAt = formatted_date
         
+            
+        
+            
         session.commit()
         session.refresh(order)
+
         return order
+
 
 @router.post("/orders/add-product", response_model=Order, tags=['Orders'])
 def add_product_to_order(user_id: int, product_id: int, quantity: int):
-    
     with Session(db) as session:
         product = session.get(Product, product_id)
         if not product:
@@ -99,24 +110,24 @@ def add_product_to_order(user_id: int, product_id: int, quantity: int):
         return existing_order
 
 @router.patch("/orders/{order_id}/edit-product", response_model=Order, tags=['Orders'])
-def update_product_in_order(order_id: int, product_id: int, quantity: int):
+def update_product_in_order(order_id: int, product_update: OrderProductRelationUpdate):
     with Session(db) as session:
         order = session.get(Order, order_id)
-        product = session.get(Product, product_id)
+        product = session.get(Product, product_update.productId)
         
         relation = session.exec(
             select(OrderProductRelation)
-            .where(OrderProductRelation.orderId == order_id, OrderProductRelation.productId == product_id)
+            .where(OrderProductRelation.orderId == order_id, OrderProductRelation.productId == product_update.productId)
         ).first()
 
-        if product.stock < quantity:
+        if product.stock < product_update.quantity:
             raise HTTPException(status_code=400, detail="Not enough stock available")
 
         current_quantity = relation.quantity
-        relation.quantity = quantity
-        product.stock = product.stock - (quantity - current_quantity)
+        relation.quantity = product_update.quantity	
+        product.stock = product.stock - (product_update.quantity - current_quantity)
 
-        if quantity == 0:
+        if product_update.quantity == 0:
             session.delete(relation)
             session.commit()
 
@@ -136,7 +147,7 @@ def update_product_in_order(order_id: int, product_id: int, quantity: int):
         
         return order
 
-@router.delete("/orders/{order_id}", response_model=Order, tags=['Orders'])
+@router.delete("/orders/{order_id}", tags=['Orders'])
 def delete_order(order_id: int) -> bool:
     with Session(db) as session:
         try:
@@ -195,3 +206,23 @@ def delete_product_from_order(order_id: int, product_id: int):
         session.refresh(order)
         
         return order
+    
+@router.get("/orders/{order_id}/products", response_model=List[ProductWithQuantity], tags=["Orders"])
+def get_products_of_order(order_id: int):
+    with Session(db) as session:
+        relations = session.exec(
+            select(OrderProductRelation).where(OrderProductRelation.orderId == order_id)
+        ).all()
+        
+        product_ids = [relation.productId for relation in relations]
+        products = session.exec(
+            select(Product).where(Product.id.in_(product_ids))
+        ).all()
+        
+        products_with_quantity = []
+        
+        for relation in relations:
+            product = next((p for p in products if p.id == relation.productId), None)
+            if product:
+                products_with_quantity.append(ProductWithQuantity(product=product, quantity=relation.quantity))
+        return products_with_quantity

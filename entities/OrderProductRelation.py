@@ -14,3 +14,7 @@ class OrderProductRelation(SQLModel, table=True):
         ForeignKeyConstraint(["productId"], ["products.id"], name="order_product_relations_ProductId_fkey", ondelete="CASCADE"),
     )
     
+class OrderProductRelationUpdate(SQLModel):
+    productId : int
+    quantity: int
+    

@@ -10,6 +10,7 @@ class User(SQLModel, table=True):
     isAdmin: bool = Field(default=False)
     isModerator: bool = Field(default=False)
     isFarmer: bool = Field(default=False)
+    isActive: bool = Field(default=True)
 
     name: str
     surname: str
@@ -30,8 +31,10 @@ class User(SQLModel, table=True):
 
 class UserUpdate(SQLModel):
     farmerId: Optional[int] = None
+    isAdmin: Optional[bool] = None
     isModerator: Optional[bool] = None
     isFarmer: Optional[bool] = None
+    isActive: Optional[bool] = None
 
     name: Optional[str] = None
     surname: Optional[str] = None
