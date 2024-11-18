@@ -15,6 +15,7 @@ from entities.OrderProductRelation import OrderProductRelation
 from entities.Review import Review
 from entities.NewCategoryRequest import NewCategoryRequest
 from enums.Unit import Unit
+from auth import get_password_hash
 
 connection_string = URL.create(
     'postgresql',
@@ -56,12 +57,12 @@ def main() -> None:
     with Session() as session:
         print("Inserting users")
         session.add_all([
-            User(name="John", surname="Doe", email="jd@gmail.com", password="password", phone="+421908111222", state="Slovenská republika", city="Bratislava", street="Mlynské nivy", streetNumber="45", zipCode="821 09"),
-            User(name="Emma", surname="Smith", email="es@gmail.com", password="password", phone="+421908111223", state="Slovenská republika", city="Košice", street="Hlavná", streetNumber="1", zipCode="040 01"),
-            User(name="Michael", surname="Johnson", email="mj@gmail.com", password="password", phone="+421908111224", state="Slovenská republika", city="Žilina", street="Námestie A. Hlinku", streetNumber="1", zipCode="010 01"),
-            User(name="Sophia", surname="Williams", email="sw@gmail.com", password="password", phone="+420777111222", state="Česká republika", city="Brno", street="Náměstí Svobody", streetNumber="1", zipCode="602 00"),
-            User(name="James", surname="Brown", email="jb@gmail.com", password="password", phone="+420777111223", state="Česká republika", city="Praha", street="Václavské náměstí", streetNumber="1", zipCode="110 00"),
-            User(name="Olivia", surname="Davis", email="od@gmail.com", password="password", phone="+420777111224", state="Česká republika", city="Ostrava", street="Masarykovo náměstí", streetNumber="1", zipCode="702 00"),
+            User(name="John", surname="Doe", email="jd@gmail.com", password=get_password_hash("password"), phone="+421908111222", state="Slovenská republika", city="Bratislava", street="Mlynské nivy", streetNumber="45", zipCode="821 09"),
+            User(name="Emma", surname="Smith", email="es@gmail.com", password=get_password_hash("password"), phone="+421908111223", state="Slovenská republika", city="Košice", street="Hlavná", streetNumber="1", zipCode="040 01"),
+            User(name="Michael", surname="Johnson", email="mj@gmail.com", password=get_password_hash("password"), phone="+421908111224", state="Slovenská republika", city="Žilina", street="Námestie A. Hlinku", streetNumber="1", zipCode="010 01"),
+            User(name="Sophia", surname="Williams", email="sw@gmail.com", password=get_password_hash("password"), phone="+420777111222", state="Česká republika", city="Brno", street="Náměstí Svobody", streetNumber="1", zipCode="602 00"),
+            User(name="James", surname="Brown", email="jb@gmail.com", password=get_password_hash("password"), phone="+420777111223", state="Česká republika", city="Praha", street="Václavské náměstí", streetNumber="1", zipCode="110 00"),
+            User(name="Olivia", surname="Davis", email="od@gmail.com", password=get_password_hash("password"), phone="+420777111224", state="Česká republika", city="Ostrava", street="Masarykovo náměstí", streetNumber="1", zipCode="702 00"),
         ])
         session.commit()
 
@@ -81,8 +82,11 @@ def main() -> None:
         farmer2 = session.query(Farmer).filter_by(farmName="Emma's Farm").first()
         farmer3 = session.query(Farmer).filter_by(farmName="Sophia's Farm").first()
         user1.farmerId = farmer1.id
+        user1.isFarmer = True
         user2.farmerId = farmer2.id
+        user2.isFarmer = True
         user3.farmerId = farmer3.id
+        user3.isFarmer = True
         session.add_all([user1, user2, user3])
         session.commit()
 
