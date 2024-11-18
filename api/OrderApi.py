@@ -8,7 +8,7 @@ from enums.OrderStatus import OrderStatus
 from entities.Order import Order, OrderUpdate
 from entities.Farmer import Farmer
 from entities.OrderProductRelation import OrderProductRelation, OrderProductRelationUpdate
-from entities.Product import Product
+from entities.Product import Product, ProductWithQuantity
 
 router = APIRouter()
 db = create_engine(DATABASE_URL)
@@ -207,7 +207,7 @@ def delete_product_from_order(order_id: int, product_id: int):
         
         return order
     
-@router.get("/orders/{order_id}/products", response_model=List[Product], tags=["Orders"])
+@router.get("/orders/{order_id}/products", response_model=List[ProductWithQuantity], tags=["Orders"])
 def get_products_of_order(order_id: int):
     with Session(db) as session:
         relations = session.exec(
@@ -219,8 +219,10 @@ def get_products_of_order(order_id: int):
             select(Product).where(Product.id.in_(product_ids))
         ).all()
         
+        products_with_quantity = []
+        
         for relation in relations:
             product = next((p for p in products if p.id == relation.productId), None)
             if product:
-                product.stock = relation.quantity
-        return products
+                products_with_quantity.append(ProductWithQuantity(product=product, quantity=relation.quantity))
+        return products_with_quantity
