@@ -65,7 +65,6 @@ def update_order_status(order_id: int, new_status_update: OrderUpdate) -> Order:
 
 @router.post("/orders/add-product", response_model=Order, tags=['Orders'])
 def add_product_to_order(user_id: int, product_id: int, quantity: int):
-    print(user_id, product_id, quantity)
     with Session(db) as session:
         product = session.get(Product, product_id)
         if not product:
@@ -148,7 +147,7 @@ def update_product_in_order(order_id: int, product_update: OrderProductRelationU
         
         return order
 
-@router.delete("/orders/{order_id}", response_model=Order, tags=['Orders'])
+@router.delete("/orders/{order_id}", tags=['Orders'])
 def delete_order(order_id: int) -> bool:
     with Session(db) as session:
         try:
