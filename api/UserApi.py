@@ -5,7 +5,7 @@ from sqlalchemy import and_, or_
 from sqlmodel import Session, create_engine, select
 
 # local imports
-from auth import get_current_user
+from auth import get_current_active_user, get_current_user
 from entities.User import User, UserUpdate
 from constants.databaseURL import DATABASE_URL
 
@@ -15,11 +15,15 @@ db = create_engine(DATABASE_URL)
 
 @router.get("/users", tags=["Users"])
 def get_users(
+    current_active_user: Annotated[User, Depends(get_current_active_user)],
     nameFilter: Optional[str] = Query(None),
     roleFilter: Optional[str] = Query(None),
     sortField: Optional[str] = Query(None),
     sortDirection: Optional[str] = Query(None)
 ) -> list[User]:
+    if not current_active_user.isAdmin:
+        raise HTTPException(status_code=403, detail="You do not have permission to access this resource.")
+
     with Session(db) as session:
         query = select(User)
 
@@ -50,17 +54,25 @@ def get_users(
     
 @router.get("/users/me", tags=["Users"])
 def get_logged_in_user(
-    current_user: Annotated[User, Depends(get_current_user)],
+    current_active_user: Annotated[User, Depends(get_current_active_user)],
 ) -> User:
-    return current_user
+    return current_active_user
 
 @router.get("/users/{user_id}", tags=["Users"])
-def get_user_by_id(user_id: int) -> User:
+def get_user_by_id(
+    current_active_user: Annotated[User, Depends(get_current_active_user)],
+    user_id: int) -> User:
+    if (current_active_user.id != user_id) and (not current_active_user.isAdmin):
+        raise HTTPException(status_code=403, detail="You do not have permission to access this resource.")
+    
     with Session(db) as session:
         return session.exec(select(User).where(User.id == user_id)).one()
     
 @router.post("/users", tags=["Users"])
 def create_user(user: User) -> User:
+    if user.isAdmin or user.isModerator or user.isFarmer:
+        raise HTTPException(status_code=403, detail="You do not have permission to create this type of user.")
+    
     with Session(db) as session:
         session.add(user)
         session.commit()
@@ -68,7 +80,12 @@ def create_user(user: User) -> User:
         return user
     
 @router.patch("/users/{user_id}", tags=["Users"])
-def update_user(user_id: int, user_update: UserUpdate) -> User:
+def update_user(
+    current_active_user: Annotated[User, Depends(get_current_active_user)],
+    user_id: int, user_update: UserUpdate) -> User:
+    if (current_active_user.id != user_id) and (not current_active_user.isAdmin):
+        raise HTTPException(status_code=403, detail="You can only update your own profile.")
+    
     with Session(db) as session:
         user = session.exec(select(User).where(User.id == user_id)).one()
         
@@ -81,10 +98,14 @@ def update_user(user_id: int, user_update: UserUpdate) -> User:
     
 @router.patch("/users/{user_id}/password", tags=["Users"])
 def change_user_password(
+    current_active_user: Annotated[User, Depends(get_current_active_user)],
     user_id: int,
     old_password: str,
     new_password: str
 ) -> User:
+    if (current_active_user.id != user_id) and (not current_active_user.isAdmin):
+        raise HTTPException(status_code=403, detail="You can only update your own password.")
+
     with Session(db) as session:
         user = session.exec(select(User).where(User.id == user_id)).one()
         if user.password != old_password:
@@ -97,7 +118,12 @@ def change_user_password(
 
 #delete
 @router.delete("/users/{user_id}", tags=["Users"])
-def delete_user(user_id: int) -> bool:
+def delete_user(
+    current_active_user: Annotated[User, Depends(get_current_active_user)],
+    user_id: int) -> bool:
+    if (not current_active_user.isAdmin):
+        raise HTTPException(status_code=403, detail="You do not have permission to delete users.")
+
     with Session(db) as session:
         try:
             user = session.exec(select(User).where(User.id == user_id)).one()

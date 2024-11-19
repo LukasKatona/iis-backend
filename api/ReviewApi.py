@@ -1,8 +1,9 @@
-from typing import Optional, List
-from fastapi import APIRouter, HTTPException, Query
+from typing import Annotated, Optional, List
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlmodel import Session, create_engine, select, and_
 from datetime import datetime
 
+from auth import get_current_active_user
 from entities.Review import Review
 from entities.User import User
 from entities.Product import Product
@@ -33,13 +34,21 @@ def get_reviews(userIdFilter: Optional[int] = Query(None), productIdFilter: Opti
         return session.exec(query).all()
 
 @router.post("/reviews/order/{order_id}", response_model=Review, tags=["Reviews"])
-def create_review_for_order(userId: int, orderId: int, rating: int, review: Optional[str] = None) -> Review:
+def create_review_for_order(
+    current_active_user: Annotated[User, Depends(get_current_active_user)],
+    orderId: int, rating: int, review: Optional[str] = None) -> Review:
     if rating < 1 or rating > 5:
         raise HTTPException(status_code=400, detail="Rating must be between 1 and 5.")
 
     with Session(db) as session:
+        your_order = session.exec(select(Order).where(Order.id == orderId)).one()
+        if not your_order:
+            raise HTTPException(status_code=404, detail="Order not found.")
+        if your_order.userId != current_active_user.id:
+            raise HTTPException(status_code=403, detail="You can only review your own orders.")
+
         new_review = Review(
-            userId=userId,
+            userId=current_active_user.id,
             orderId=orderId,
             rating=rating,
             review=review,
@@ -52,13 +61,15 @@ def create_review_for_order(userId: int, orderId: int, rating: int, review: Opti
         return new_review
     
 @router.post("/reviews/product/{product_id}", response_model=Review, tags=["Reviews"])
-def create_review_for_product(userId: int, orderId: int, productId: int, rating: int, review: Optional[str] = None) -> Review:
+def create_review_for_product(
+    current_active_user: Annotated[User, Depends(get_current_active_user)],
+    orderId: int, productId: int, rating: int, review: Optional[str] = None) -> Review:
     if rating < 1 or rating > 5:
         raise HTTPException(status_code=400, detail="Rating must be between 1 and 5.")
     
     with Session(db) as session:
         new_review = Review(
-            userId=userId,
+            userId=current_active_user.id,
             orderId=orderId,
             productId=productId,
             rating=rating,
@@ -72,13 +83,18 @@ def create_review_for_product(userId: int, orderId: int, productId: int, rating:
         return new_review
 
 @router.delete("/reviews/{review_id}", response_model=Review, tags=["Reviews"])
-def delete_review(review_id: int, product_id: Optional[int] = None, order_id: Optional[int] = None) -> bool:
+def delete_review(
+    current_active_user: Annotated[User, Depends(get_current_active_user)],
+    review_id: int) -> bool:
     with Session(db) as session:
         try:        
             review = session.exec(select(Review).where(Review.id == review_id)).one()
             
             if not review:
                 raise HTTPException(status_code=404, detail="Review not found.")
+            
+            if review.userId != current_active_user.id:
+                raise HTTPException(status_code=403, detail="You can only delete your own reviews.")
             
             session.delete(review)
             session.commit()

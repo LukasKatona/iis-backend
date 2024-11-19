@@ -1,14 +1,16 @@
-from fastapi import APIRouter, HTTPException, Response
-from typing import List, Optional
+from fastapi import APIRouter, Depends, HTTPException, Response
+from typing import Annotated, List, Optional
 from sqlmodel import Session, create_engine, select
 from datetime import datetime
-from constants.databaseURL import DATABASE_URL
 
 from enums.OrderStatus import OrderStatus
 from entities.Order import Order, OrderUpdate
 from entities.Farmer import Farmer
 from entities.OrderProductRelation import OrderProductRelation, OrderProductRelationUpdate
 from entities.Product import Product, ProductWithQuantity
+from auth import get_current_active_user
+from entities.User import User
+from constants.databaseURL import DATABASE_URL
 
 router = APIRouter()
 db = create_engine(DATABASE_URL)
@@ -19,7 +21,10 @@ def generate_order_number() -> str:
     return f"ORD-{int(datetime.now().timestamp())}"
 
 @router.get("/orders", response_model=List[Order], tags=['Orders'])
-def get_orders(user_id: Optional[int] = None, farmer_id: Optional[int] = None, status: Optional[OrderStatus] = None, exclude_status: Optional[OrderStatus] = None) -> List[Order]:
+def get_orders(
+    current_active_user: Annotated[User, Depends(get_current_active_user)],
+    user_id: Optional[int] = None, farmer_id: Optional[int] = None, status: Optional[OrderStatus] = None, exclude_status: Optional[OrderStatus] = None) -> List[Order]:
+    
     with Session(db) as session:
         query = select(Order)
         filters = []
@@ -40,23 +45,21 @@ def get_orders(user_id: Optional[int] = None, farmer_id: Optional[int] = None, s
 
 
 @router.patch("/orders/{order_id}/status", tags=['Orders'])
-def update_order_status(order_id: int, new_status_update: OrderUpdate) -> Order:
+def update_order_status(
+    current_active_user: Annotated[User, Depends(get_current_active_user)],
+    order_id: int, new_status_update: OrderUpdate) -> Order:
     with Session(db) as session:
         order = session.get(Order, order_id)
        
         if isinstance(new_status_update.status, str):
             new_status_update = OrderStatus.strToEnum(new_status_update.status)
 
-
         order.status = new_status_update.status
         order.updatedAt = formatted_date
         
         if new_status_update.status == OrderStatus.SUPPLIED:
             order.suppliedAt = formatted_date
-        
-            
-        
-            
+          
         session.commit()
         session.refresh(order)
 
@@ -64,7 +67,9 @@ def update_order_status(order_id: int, new_status_update: OrderUpdate) -> Order:
 
 
 @router.post("/orders/add-product", response_model=Order, tags=['Orders'])
-def add_product_to_order(user_id: int, product_id: int, quantity: int):
+def add_product_to_order(
+    current_active_user: Annotated[User, Depends(get_current_active_user)],
+    user_id: int, product_id: int, quantity: int):
     with Session(db) as session:
         product = session.get(Product, product_id)
         if not product:
@@ -110,7 +115,9 @@ def add_product_to_order(user_id: int, product_id: int, quantity: int):
         return existing_order
 
 @router.patch("/orders/{order_id}/edit-product", response_model=Order, tags=['Orders'])
-def update_product_in_order(order_id: int, product_update: OrderProductRelationUpdate):
+def update_product_in_order(
+    current_active_user: Annotated[User, Depends(get_current_active_user)],
+    order_id: int, product_update: OrderProductRelationUpdate):
     with Session(db) as session:
         order = session.get(Order, order_id)
         product = session.get(Product, product_update.productId)
@@ -148,7 +155,9 @@ def update_product_in_order(order_id: int, product_update: OrderProductRelationU
         return order
 
 @router.delete("/orders/{order_id}", tags=['Orders'])
-def delete_order(order_id: int) -> bool:
+def delete_order(
+    current_active_user: Annotated[User, Depends(get_current_active_user)],
+    order_id: int) -> bool:
     with Session(db) as session:
         try:
             order = session.get(Order, order_id)
@@ -174,7 +183,9 @@ def delete_order(order_id: int) -> bool:
             return False
 
 @router.delete("/orders/{order_id}/product/{product_id}", response_model=Order, tags=['Orders'])
-def delete_product_from_order(order_id: int, product_id: int):
+def delete_product_from_order(
+    current_active_user: Annotated[User, Depends(get_current_active_user)],
+    order_id: int, product_id: int):
     with Session(db) as session:
         order = session.get(Order, order_id)
        
@@ -208,7 +219,9 @@ def delete_product_from_order(order_id: int, product_id: int):
         return order
     
 @router.get("/orders/{order_id}/products", response_model=List[ProductWithQuantity], tags=["Orders"])
-def get_products_of_order(order_id: int):
+def get_products_of_order(
+    current_active_user: Annotated[User, Depends(get_current_active_user)],
+    order_id: int):
     with Session(db) as session:
         relations = session.exec(
             select(OrderProductRelation).where(OrderProductRelation.orderId == order_id)
