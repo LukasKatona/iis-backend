@@ -61,6 +61,27 @@ def get_products(
             products_with_rating.append(ProductWithRating(**product.model_dump(), rating=rating))
 
         return products_with_rating
+    
+@router.get("/products/most-popular", tags=["Products"])
+def get_products() -> list[ProductWithRating]:
+    with Session(db) as session:
+        query = select(Product)
+
+        # get products with rating
+        products_with_rating = []  
+        products = session.exec(query).all()
+        for product in products:
+            product_reviews = session.exec(select(Review).where(Review.productId == product.id)).all()
+            if len(product_reviews) > 0:
+                rating = sum([review.rating for review in product_reviews]) / len(product_reviews)
+            else:
+                rating = 0
+            products_with_rating.append(ProductWithRating(**product.model_dump(), rating=rating))
+
+        products_with_rating.sort(key=lambda x: x.rating, reverse=True)
+        products_with_rating = [product for product in products_with_rating if product.rating > 0]
+        
+        return products_with_rating[:5]
 
 def get_subcategory_ids(category: ProductCategory) -> list[int]:
     subcategory_ids = [category.id]
