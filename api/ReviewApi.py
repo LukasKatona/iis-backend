@@ -32,55 +32,48 @@ def get_reviews(userIdFilter: Optional[int] = Query(None), productIdFilter: Opti
             query = query.where(and_(*filters))
         
         return session.exec(query).all()
-
-@router.post("/reviews/order/{order_id}", response_model=Review, tags=["Reviews"])
-def create_review_for_order(
+    
+@router.post("/reviews", response_model=Review, tags=["Reviews"])
+def create_review_for_product(
     current_active_user: Annotated[User, Depends(get_current_active_user)],
-    order_id: int, rating: int, review: Optional[str] = None) -> Review:
-    if rating < 1 or rating > 5:
+    new_review: Review) -> Review:
+    if new_review.userId != current_active_user.id:
+        raise HTTPException(status_code=403, detail="You can only review products as yourself.")
+    if new_review.rating < 0 or new_review.rating > 5:
         raise HTTPException(status_code=400, detail="Rating must be between 1 and 5.")
-
+    
     with Session(db) as session:
-        your_order = session.exec(select(Order).where(Order.id == order_id)).one()
+        your_order = session.exec(select(Order).where(Order.id == new_review.orderId)).one()
         if not your_order:
             raise HTTPException(status_code=404, detail="Order not found.")
         if your_order.userId != current_active_user.id:
             raise HTTPException(status_code=403, detail="You can only review your own orders.")
-
-        new_review = Review(
-            userId=current_active_user.id,
-            orderId=order_id,
-            rating=rating,
-            review=review,
-            createdAt=formatted_date
-        )
         
+        new_review.createdAt = formatted_date
         session.add(new_review)
         session.commit()
         session.refresh(new_review)
         return new_review
     
-@router.post("/reviews/product/{product_id}", response_model=Review, tags=["Reviews"])
+@router.patch("/reviews/{review_id}", response_model=Review, tags=["Reviews"])
 def create_review_for_product(
     current_active_user: Annotated[User, Depends(get_current_active_user)],
-    order_id: int, productId: int, rating: int, review: Optional[str] = None) -> Review:
-    if rating < 1 or rating > 5:
+    review_update: Review) -> Review:
+    if review_update.userId != current_active_user.id:
+        raise HTTPException(status_code=403, detail="You can only review products as yourself.")
+    if review_update.rating < 0 or review_update.rating > 5:
         raise HTTPException(status_code=400, detail="Rating must be between 1 and 5.")
     
     with Session(db) as session:
-        new_review = Review(
-            userId=current_active_user.id,
-            orderId=order_id,
-            productId=productId,
-            rating=rating,
-            review=review,
-            createdAt=formatted_date
-        )
-        
-        session.add(new_review)
+        review = session.exec(select(Review).where(Review.id == review_update.id)).one()
+
+        for key, value in review_update.model_dump().items():
+            if value is not None:
+                setattr(review, key, value)
+        session.add(review)
         session.commit()
-        session.refresh(new_review)
-        return new_review
+        session.refresh(review)
+        return review
 
 @router.delete("/reviews/{review_id}", response_model=Review, tags=["Reviews"])
 def delete_review(

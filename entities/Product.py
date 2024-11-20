@@ -5,6 +5,7 @@ from sqlmodel import Field, SQLModel
 
 # local imports
 from enums.Unit import Unit
+from entities.Review import Review
 
 class Product(SQLModel, table=True):
     __tablename__ = 'products'
@@ -23,6 +24,9 @@ class Product(SQLModel, table=True):
         ForeignKeyConstraint(["farmerId"], ["farmers.id"], name="products_farmerId_fkey", ondelete="CASCADE"),
     )
 
+class ProductWithRating(Product):
+    rating: float
+
 class ProductUpdate(SQLModel):
     name: Optional[str] = None
     imageUrl: Optional[str] = None
@@ -35,3 +39,4 @@ class ProductUpdate(SQLModel):
 class ProductWithQuantity(SQLModel):
     product: Product
     quantity: int
+    review: Optional[Review] = None
