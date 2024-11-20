@@ -10,6 +10,7 @@ from entities.OrderProductRelation import OrderProductRelation, OrderProductRela
 from entities.Product import Product, ProductWithQuantity
 from auth import get_current_active_user
 from entities.User import User
+from entities.Review import Review
 from constants.databaseURL import DATABASE_URL
 
 router = APIRouter()
@@ -237,5 +238,8 @@ def get_products_of_order(
         for relation in relations:
             product = next((p for p in products if p.id == relation.productId), None)
             if product:
-                products_with_quantity.append(ProductWithQuantity(product=product, quantity=relation.quantity))
+                product_review = session.exec(
+                    select(Review).where(Review.productId == product.id and Review.orderId == order_id and Review.userId == current_active_user.id)
+                ).first()
+                products_with_quantity.append(ProductWithQuantity(product=product, quantity=relation.quantity, review=product_review))
         return products_with_quantity
