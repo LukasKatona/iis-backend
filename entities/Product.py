@@ -18,6 +18,7 @@ class Product(SQLModel, table=True):
     stock: int = Field(default=0)
     categoryId : int = Field(default=None, index=True, nullable=True)
     farmerId: int = Field(default=None, index=True)
+    categoryAtributes: str = Field(default=None, nullable=True)
 
     __table_args__ = (
         ForeignKeyConstraint(["categoryId"], ["product_categories.id"], name="products_categoryId_fkey", ondelete="SET NULL"),
