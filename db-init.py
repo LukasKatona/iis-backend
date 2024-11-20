@@ -4,6 +4,7 @@ from sqlalchemy import URL
 from datetime import datetime
 
 # local imports
+from constants.databaseURL import DATABASE_URL
 from entities.Product import Product
 from entities.ProductCategory import ProductCategory
 from entities.User import User
@@ -17,15 +18,7 @@ from entities.NewCategoryRequest import NewCategoryRequest
 from enums.Unit import Unit
 from auth import get_password_hash
 
-connection_string = URL.create(
-    'postgresql',
-    username='admin',
-    password='pgtvTuwoV5G7',
-    host='ep-wild-mode-a2zrk2og.eu-central-1.pg.koyeb.app',
-    database='koyebdb',
-)
-
-db = sa.create_engine(connection_string)
+db = sa.create_engine(DATABASE_URL)
 Session = sa.orm.sessionmaker(bind=db)
 Base = sa.orm.declarative_base()
 
@@ -232,28 +225,19 @@ def main() -> None:
         
         print("Inserting reviews")
         user1 = session.query(User).filter_by(name="James").first()
-        user2 = session.query(User).filter_by(name="Olivia").first()
-        user3 = session.query(User).filter_by(name="Michael").first()
+        order1 = session.query(Order).filter_by(orderNumber="ORD-001").first()
         product1 = session.query(Product).filter_by(name="Spinach").first()
         product2 = session.query(Product).filter_by(name="Kale").first()
-        product3 = session.query(Product).filter_by(name="Carrot").first()
-        product4 = session.query(Product).filter_by(name="Beetroot").first()
-        product5 = session.query(Product).filter_by(name="Peas").first()
-        order1 = session.query(Order).filter_by(orderNumber="ORD-001").first()
-        order2 = session.query(Order).filter_by(orderNumber="ORD-002").first()
-        order3 = session.query(Order).filter_by(orderNumber="ORD-003").first()
         order4 = session.query(Order).filter_by(orderNumber="ORD-004").first()
+        product3 = session.query(Product).filter_by(name="Orange").first()
+        product4 = session.query(Product).filter_by(name="Lemon").first()
         session.add_all([
-            Review(userId=user1.id, productId=product1.id, rating=5, review="Great product!", createdAt="2021-10-01 11:00"),
-            Review(userId=user1.id, productId=product2.id, rating=4, review="Good product!", createdAt="2021-10-01 11:00"),
-            Review(userId=user2.id, productId=product3.id, rating=3, review="Average product!", createdAt="2021-10-02 11:00"),
-            Review(userId=user2.id, productId=product4.id, rating=2, review="Not so good product!", createdAt="2021-10-02 11:00"),
-            Review(userId=user3.id, productId=product5.id, rating=1, review="Bad product!", createdAt="2021-10-03 11:00"),
-            Review(userId=user3.id, productId=product6.id, rating=5, review="Great product!", createdAt="2021-10-03 11:00"),
             Review(userId=user1.id, orderId=order1.id, rating=4, review="Good service!", createdAt="2021-10-01 11:00"),
-            Review(userId=user1.id, orderId=order2.id, rating=3, review="Average service!", createdAt="2021-10-01 11:00"),
-            Review(userId=user2.id, orderId=order3.id, rating=2, review="Not so good service!", createdAt="2021-10-02 11:00"),
-            Review(userId=user2.id, orderId=order4.id, rating=1, review="Bad service!", createdAt="2021-10-02 11:00"),
+            Review(userId=user1.id, orderId=order1.id, productId=product1.id, rating=5, review="Great product!", createdAt="2021-10-01 11:00"),
+            Review(userId=user1.id, orderId=order1.id, productId=product2.id, rating=4, review="Good product!", createdAt="2021-10-01 11:00"),
+            Review(userId=user1.id, orderId=order4.id, rating=3, review="Average service!", createdAt="2021-10-01 11:00"),
+            Review(userId=user1.id, orderId=order4.id, productId=product3.id, rating=2, review="Bad product!", createdAt="2021-10-01 11:00"),
+            Review(userId=user1.id, orderId=order4.id, productId=product4.id, rating=1, review="Terrible product!", createdAt="2021-10-01 11:00"),
         ])
         session.commit()
         
