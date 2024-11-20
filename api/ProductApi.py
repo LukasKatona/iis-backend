@@ -8,10 +8,11 @@ from sqlmodel import Session, create_engine, select
 # local imports
 from entities.Farmer import Farmer
 from entities.ProductCategory import ProductCategory
-from entities.Product import Product, ProductUpdate
+from entities.Product import Product, ProductUpdate, ProductWithRating
 from constants.databaseURL import DATABASE_URL
 from auth import get_current_active_user
 from entities.User import User
+from entities.Review import Review
 from enums.Unit import Unit
 
 router = APIRouter()
@@ -25,7 +26,7 @@ def get_products(
     farmerIdFilter: Optional[int] = Query(None),
     sortField: Optional[str] = Query(None),
     sortDirection: Optional[str] = Query(None)
-) -> list[Product]:
+) -> list[ProductWithRating]:
     with Session(db) as session:
         query = select(Product)
 
@@ -47,8 +48,19 @@ def get_products(
                 query = query.order_by(sortField)
             else:
                 query = query.order_by(sortField.desc())
-            
-        return session.exec(query).all()
+
+        # get products with rating
+        products_with_rating = []  
+        products = session.exec(query).all()
+        for product in products:
+            product_reviews = session.exec(select(Review).where(Review.productId == product.id)).all()
+            if len(product_reviews) > 0:
+                rating = sum([review.rating for review in product_reviews]) / len(product_reviews)
+            else:
+                rating = 0
+            products_with_rating.append(ProductWithRating(**product.model_dump(), rating=rating))
+
+        return products_with_rating
 
 def get_subcategory_ids(category: ProductCategory) -> list[int]:
     subcategory_ids = [category.id]
@@ -57,8 +69,7 @@ def get_subcategory_ids(category: ProductCategory) -> list[int]:
         subcategory_ids.extend(get_subcategory_ids(subcategory))
     
     return subcategory_ids
-
-    
+  
 @router.get("/products/{product_id}", tags=["Products"])
 def get_product_by_id(product_id: int) -> Product:
     with Session(db) as session:

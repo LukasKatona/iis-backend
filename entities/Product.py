@@ -23,6 +23,9 @@ class Product(SQLModel, table=True):
         ForeignKeyConstraint(["farmerId"], ["farmers.id"], name="products_farmerId_fkey", ondelete="CASCADE"),
     )
 
+class ProductWithRating(Product):
+    rating: float
+
 class ProductUpdate(SQLModel):
     name: Optional[str] = None
     imageUrl: Optional[str] = None
