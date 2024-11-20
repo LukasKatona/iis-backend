@@ -2,8 +2,8 @@ from sqlalchemy import URL
 
 DATABASE_URL = URL.create(
     'postgresql',
-    username='admin',
-    password='pgtvTuwoV5G7',
-    host='ep-wild-mode-a2zrk2og.eu-central-1.pg.koyeb.app',
+    username='koyeb-adm',
+    password='xkcAdt5aF4zL',
+    host='ep-lingering-surf-a2irdt6k.eu-central-1.pg.koyeb.app',
     database='koyebdb',
 )
