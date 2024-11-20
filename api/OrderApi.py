@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Response
 from typing import Annotated, List, Optional
+from sqlalchemy import and_
 from sqlmodel import Session, create_engine, select
 from datetime import datetime
 
@@ -239,7 +240,7 @@ def get_products_of_order(
             product = next((p for p in products if p.id == relation.productId), None)
             if product:
                 product_review = session.exec(
-                    select(Review).where(Review.productId == product.id and Review.orderId == order_id and Review.userId == current_active_user.id)
+                    select(Review).where(and_(Review.productId == product.id, Review.orderId == order_id, Review.userId == current_active_user.id))
                 ).first()
                 products_with_quantity.append(ProductWithQuantity(product=product, quantity=relation.quantity, review=product_review))
         return products_with_quantity

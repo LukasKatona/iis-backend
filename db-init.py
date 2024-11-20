@@ -50,12 +50,12 @@ def main() -> None:
     with Session() as session:
         print("Inserting users")
         session.add_all([
-            User(name="John", surname="Doe", email="jd@gmail.com", password=get_password_hash("password"), phone="+421908111222", state="Slovenská republika", city="Bratislava", street="Mlynské nivy", streetNumber="45", zipCode="821 09"),
-            User(name="Emma", surname="Smith", email="es@gmail.com", password=get_password_hash("password"), phone="+421908111223", state="Slovenská republika", city="Košice", street="Hlavná", streetNumber="1", zipCode="040 01"),
+            User(name="John", surname="Doe", isModerator=True, email="jd@gmail.com", password=get_password_hash("password"), phone="+421908111222", state="Slovenská republika", city="Bratislava", street="Mlynské nivy", streetNumber="45", zipCode="821 09"),
+            User(name="Emma", surname="Smith", isAdmin=True, email="es@gmail.com", password=get_password_hash("password"), phone="+421908111223", state="Slovenská republika", city="Košice", street="Hlavná", streetNumber="1", zipCode="040 01"),
             User(name="Michael", surname="Johnson", email="mj@gmail.com", password=get_password_hash("password"), phone="+421908111224", state="Slovenská republika", city="Žilina", street="Námestie A. Hlinku", streetNumber="1", zipCode="010 01"),
             User(name="Sophia", surname="Williams", email="sw@gmail.com", password=get_password_hash("password"), phone="+420777111222", state="Česká republika", city="Brno", street="Náměstí Svobody", streetNumber="1", zipCode="602 00"),
             User(name="James", surname="Brown", email="jb@gmail.com", password=get_password_hash("password"), phone="+420777111223", state="Česká republika", city="Praha", street="Václavské náměstí", streetNumber="1", zipCode="110 00"),
-            User(name="Olivia", surname="Davis", email="od@gmail.com", password=get_password_hash("password"), phone="+420777111224", state="Česká republika", city="Ostrava", street="Masarykovo náměstí", streetNumber="1", zipCode="702 00"),
+            User(name="Olivia", surname="Davis", isActive=False, email="od@gmail.com", password=get_password_hash("password"), phone="+420777111224", state="Česká republika", city="Ostrava", street="Masarykovo náměstí", streetNumber="1", zipCode="702 00"),
         ])
         session.commit()
 
@@ -232,12 +232,10 @@ def main() -> None:
         product3 = session.query(Product).filter_by(name="Orange").first()
         product4 = session.query(Product).filter_by(name="Lemon").first()
         session.add_all([
-            Review(userId=user1.id, orderId=order1.id, rating=4, review="Good service!", createdAt="2021-10-01 11:00"),
-            Review(userId=user1.id, orderId=order1.id, productId=product1.id, rating=5, review="Great product!", createdAt="2021-10-01 11:00"),
-            Review(userId=user1.id, orderId=order1.id, productId=product2.id, rating=4, review="Good product!", createdAt="2021-10-01 11:00"),
-            Review(userId=user1.id, orderId=order4.id, rating=3, review="Average service!", createdAt="2021-10-01 11:00"),
-            Review(userId=user1.id, orderId=order4.id, productId=product3.id, rating=2, review="Bad product!", createdAt="2021-10-01 11:00"),
-            Review(userId=user1.id, orderId=order4.id, productId=product4.id, rating=1, review="Terrible product!", createdAt="2021-10-01 11:00"),
+            Review(userId=user1.id, orderId=order1.id, productId=product1.id, rating=5, createdAt="2021-10-01 11:00"),
+            Review(userId=user1.id, orderId=order1.id, productId=product2.id, rating=4, createdAt="2021-10-01 11:00"),
+            Review(userId=user1.id, orderId=order4.id, productId=product3.id, rating=2, createdAt="2021-10-01 11:00"),
+            Review(userId=user1.id, orderId=order4.id, productId=product4.id, rating=1, createdAt="2021-10-01 11:00"),
         ])
         session.commit()
         
