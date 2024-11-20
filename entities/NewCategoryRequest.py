@@ -10,6 +10,7 @@ class NewCategoryRequest(SQLModel, table=True):
     state: CategoryRequestState = Field(default=CategoryRequestState.PENDING)
     parentCategoryId: int = Field(default=None, nullable=True)
     createdById: int = Field(default=None, index=True, nullable=True)
+    atributes: str = Field(default=None, nullable=True)
 
     __table_args__ = (
         ForeignKeyConstraint(["parentCategoryId"], ["product_categories.id"], name="newcategoryrequest_parentCategoryId_fkey", ondelete="CASCADE"),
