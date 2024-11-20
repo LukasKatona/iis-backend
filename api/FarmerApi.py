@@ -1,10 +1,11 @@
 # library imports
-from typing import Optional, Union
-from fastapi import APIRouter, HTTPException, Query
+from typing import Annotated, Optional, Union
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import and_, or_
 from sqlmodel import Session, create_engine, select
 
 # local imports
+from auth import get_current_active_user
 from entities.User import User
 from entities.Farmer import Farmer, FarmerUpdate
 from constants.databaseURL import DATABASE_URL
@@ -41,12 +42,24 @@ def get_farmer_by_id(farmer_id: int) -> Farmer:
         return session.exec(select(Farmer).where(Farmer.id == farmer_id)).one()
     
 @router.get("/farmers/{user_id}/by-user-id", tags=["Farmers"])
-def get_farmer_by_user_id(user_id: int) -> Union[Farmer, None]:
+def get_farmer_by_user_id(
+    current_active_user: Annotated[User, Depends(get_current_active_user)],
+    user_id: int) -> Union[Farmer, None]:
+
+    if current_active_user.id != user_id and not current_active_user.isAdmin:
+        raise HTTPException(status_code=403, detail="You can only view your own farmer profile")
+
     with Session(db) as session:
         return session.exec(select(Farmer).where(Farmer.userId == user_id)).first()
     
 @router.post("/farmers", tags=["Farmers"])
-def create_farmer(farmer: Farmer) -> Farmer:
+def create_farmer(
+    current_active_user: Annotated[User, Depends(get_current_active_user)],
+    farmer: Farmer) -> Farmer:
+
+    if current_active_user.id != farmer.userId and not current_active_user.isAdmin:
+        raise HTTPException(status_code=403, detail="You can only create a farmer profile for yourself")
+
     with Session(db) as session:            
         session.add(farmer)
         session.commit()
@@ -54,9 +67,14 @@ def create_farmer(farmer: Farmer) -> Farmer:
         return farmer
 
 @router.patch("/farmers/{farmer_id}", tags=["Farmers"])
-def update_farmer(farmer_id: int, farmer_update: FarmerUpdate) -> Farmer:
+def update_farmer(
+    current_active_user: Annotated[User, Depends(get_current_active_user)],
+    farmer_id: int, farmer_update: FarmerUpdate) -> Farmer:
     with Session(db) as session:
         farmer = session.exec(select(Farmer).where(Farmer.id == farmer_id)).one()
+
+        if current_active_user.id != farmer.userId and not current_active_user.isAdmin:
+            raise HTTPException(status_code=403, detail="You can only update your own farmer profile")
         
         for key, value in farmer_update.model_dump().items():
             if value is not None:
@@ -67,7 +85,13 @@ def update_farmer(farmer_id: int, farmer_update: FarmerUpdate) -> Farmer:
         return farmer
 
 @router.delete("/farmers/{farmer_id}", tags=["Farmers"])
-def delete_farmer(farmer_id: int) -> bool:
+def delete_farmer(
+    current_active_user: Annotated[User, Depends(get_current_active_user)],
+    farmer_id: int) -> bool:
+
+    if not current_active_user.isAdmin:
+        raise HTTPException(status_code=403, detail="You do not have permission to delete farmer profiles")
+
     with Session(db) as session:
         try:
             farmer = session.exec(select(Farmer).where(Farmer.id == farmer_id)).one()

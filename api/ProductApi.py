@@ -1,15 +1,18 @@
 # library imports
-from typing import Optional
-from fastapi import APIRouter, Query
+from typing import Annotated, Optional
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy import and_
 from sqlmodel import Session, create_engine, select
-from enums.Unit import Unit
+
 
 # local imports
 from entities.Farmer import Farmer
 from entities.ProductCategory import ProductCategory
 from entities.Product import Product, ProductUpdate
 from constants.databaseURL import DATABASE_URL
+from auth import get_current_active_user
+from entities.User import User
+from enums.Unit import Unit
 
 router = APIRouter()
 
@@ -62,7 +65,12 @@ def get_product_by_id(product_id: int) -> Product:
         return session.exec(select(Product).where(Product.id == product_id)).one()
     
 @router.post("/products", tags=["Products"])
-def create_product(product: Product) -> Product:
+def create_product(
+    current_active_user: Annotated[User, Depends(get_current_active_user)],
+    product: Product) -> Product:
+    if (not current_active_user.isFarmer):
+        raise Exception("You do not have permission to create a product.")
+
     with Session(db) as session:
         if isinstance(product.unit, str):
             product.unit = Unit.strToEnum(product.unit)
@@ -73,9 +81,13 @@ def create_product(product: Product) -> Product:
     
 @router.patch("/products/{product_id}", tags=["Products"])
 def update_product(
+    current_active_user: Annotated[User, Depends(get_current_active_user)],
     product_id: int,
     product_update: ProductUpdate
 ) -> Product:
+    if (not current_active_user.isFarmer):
+        raise Exception("You do not have permission to update a product.")
+
     with Session(db) as session:
         product = session.exec(select(Product).where(Product.id == product_id)).one()
         for key, value in product_update.model_dump().items():
@@ -90,8 +102,12 @@ def update_product(
     
 @router.delete("/products/{product_id}", tags=["Products"])
 def delete_product(
+    current_active_user: Annotated[User, Depends(get_current_active_user)],
     product_id: int,
 ) -> bool:
+    if (not current_active_user.isFarmer):
+        raise Exception("You do not have permission to delete a product.")
+    
     with Session(db) as session:
         try:
             product = session.exec(select(Product).where(Product.id == product_id)).one()

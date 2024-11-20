@@ -77,6 +77,13 @@ def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
         if user is None:
             raise credentials_exception
         return user
+    
+async def get_current_active_user(
+    current_user: Annotated[User, Depends(get_current_user)],
+):
+    if current_user.isActive == False:
+        raise HTTPException(status_code=400, detail="Inactive user")
+    return current_user
 
 @router.post("/token", tags=["Authentication"])
 def login_for_access_token(
