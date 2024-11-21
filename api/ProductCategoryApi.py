@@ -1,10 +1,13 @@
 # library imports
 from typing import Annotated
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy import and_
 from sqlmodel import Session, create_engine, select
 
 # local imports
 from auth import get_current_active_user
+from api.ProductApi import get_subcategory_ids
+from entities.Product import Product
 from entities.User import User
 from entities.ProductCategory import ProductCategory, ProductCategoryUpdate
 from constants.databaseURL import DATABASE_URL
@@ -42,6 +45,12 @@ def update_product_category(
 
     with Session(db) as session:
         category = session.exec(select(ProductCategory).where(ProductCategory.id == category_id)).one()
+        
+        products_in_category = session.exec(select(Product).where(Product.categoryId == category_id)).all()
+        if len(products_in_category) > 0 and category.atributes != category_update.atributes:
+            print(category.atributes)
+            raise HTTPException(status_code=409, detail="Cannot update category attributes because there are products in this category.")
+
         for key, value in category_update.model_dump().items():
             if value is not None:
                 setattr(category, key, value)
@@ -61,13 +70,22 @@ def delete_product_category(
     with Session(db) as session:
         try:
             category = session.exec(select(ProductCategory).where(ProductCategory.id == category_id)).one()
+            
+            query = select(Product)
+            filters = []
+            filters.append(Product.categoryId.in_(get_subcategory_ids(category)))
+            query = query.where(and_(*filters))
+            products = session.exec(query).all()
+            if len(products) > 0:
+                raise HTTPException(status_code=409, detail="Cannot delete category because there are products in this category.")
+            
             delete_child_categories(category, session)
             session.delete(category)
             session.commit()
             return True
         except Exception as e:
             session.rollback()
-            return False
+            raise e;
         
     
 def delete_child_categories(category: ProductCategory, session: Session):

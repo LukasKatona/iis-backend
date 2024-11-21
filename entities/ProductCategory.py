@@ -14,3 +14,5 @@ class ProductCategory(SQLModel, table=True):
 
 class ProductCategoryUpdate(SQLModel):
     name: str
+    parentCategoryId: Optional[int]
+    atributes: Optional[str]
