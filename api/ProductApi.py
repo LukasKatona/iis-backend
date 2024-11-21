@@ -42,7 +42,7 @@ def get_products(
                 filters.append(Product.farmerId == farmerIdFilter)
             query = query.where(and_(*filters))
         
-        if sortField:
+        if sortField and sortField != "rating":
             column = getattr(Product, sortField, None) 
             if column:
                 if sortDirection == "asc":
@@ -61,6 +61,12 @@ def get_products(
                 rating = 0
             products_with_rating.append(ProductWithRating(**product.model_dump(), rating=rating))
 
+        if sortField == "rating":
+            if sortDirection == "asc":
+                products_with_rating.sort(key=lambda x: x.rating, reverse=False)
+            else:
+                products_with_rating.sort(key=lambda x: x.rating, reverse=True)
+        
         return products_with_rating
     
 @router.get("/products/most-popular", tags=["Products"])
