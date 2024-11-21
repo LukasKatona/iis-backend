@@ -48,12 +48,15 @@ def update_product_category(
         
         products_in_category = session.exec(select(Product).where(Product.categoryId == category_id)).all()
         if len(products_in_category) > 0 and category.atributes != category_update.atributes:
-            print(category.atributes)
             raise HTTPException(status_code=409, detail="Cannot update category attributes because there are products in this category.")
 
         for key, value in category_update.model_dump().items():
             if value is not None:
                 setattr(category, key, value)
+
+        if category_update.atributes == "":
+            category.atributes = None
+            
         session.add(category)
         session.commit()
         session.refresh(category)
