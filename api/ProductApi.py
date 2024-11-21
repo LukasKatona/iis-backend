@@ -1,7 +1,7 @@
 # library imports
 from typing import Annotated, Optional
 from fastapi import APIRouter, Depends, Query
-from sqlalchemy import and_
+from sqlalchemy import and_, asc, desc
 from sqlmodel import Session, create_engine, select
 
 
@@ -42,12 +42,13 @@ def get_products(
                 filters.append(Product.farmerId == farmerIdFilter)
             query = query.where(and_(*filters))
         
-        # apply sorting
-        if sortField and sortDirection:
-            if sortDirection == "asc":
-                query = query.order_by(sortField)
-            else:
-                query = query.order_by(sortField.desc())
+        if sortField:
+            column = getattr(Product, sortField, None) 
+            if column:
+                if sortDirection == "asc":
+                    query = query.order_by(asc(column))
+                else:
+                    query = query.order_by(desc(column))
 
         # get products with rating
         products_with_rating = []  

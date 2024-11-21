@@ -5,7 +5,7 @@ from sqlalchemy import and_, or_
 from sqlmodel import Session, create_engine, select
 
 # local imports
-from auth import get_current_active_user, get_current_user
+from auth import get_current_active_user, get_current_user, get_password_hash
 from entities.User import User, UserUpdate
 from constants.databaseURL import DATABASE_URL
 
@@ -72,6 +72,8 @@ def get_user_by_id(
 def create_user(user: User) -> User:
     if user.isAdmin or user.isModerator or user.isFarmer:
         raise HTTPException(status_code=403, detail="You do not have permission to create this type of user.")
+    
+    user.password = get_password_hash(user.password)
     
     with Session(db) as session:
         session.add(user)

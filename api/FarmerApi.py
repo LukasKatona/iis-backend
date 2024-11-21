@@ -60,6 +60,9 @@ def create_farmer(
     if current_active_user.id != farmer.userId and not current_active_user.isAdmin:
         raise HTTPException(status_code=403, detail="You can only create a farmer profile for yourself")
 
+    if not farmer.userId:
+        raise HTTPException(status_code=400, detail="User ID is required")
+    
     with Session(db) as session:            
         session.add(farmer)
         session.commit()
