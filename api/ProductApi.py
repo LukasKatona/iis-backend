@@ -109,6 +109,9 @@ def create_product(
     product: Product) -> Product:
     if (not current_active_user.isFarmer):
         raise Exception("You do not have permission to create a product.")
+    
+    if product.categoryAtributes == '':
+        product.categoryAtributes = None
 
     with Session(db) as session:
         if isinstance(product.unit, str):
@@ -126,6 +129,9 @@ def update_product(
 ) -> Product:
     if (not current_active_user.isFarmer):
         raise Exception("You do not have permission to update a product.")
+    
+    if product.categoryAtributes == '':
+        product.categoryAtributes = None
 
     with Session(db) as session:
         product = session.exec(select(Product).where(Product.id == product_id)).one()
