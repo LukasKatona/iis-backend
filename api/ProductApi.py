@@ -129,9 +129,6 @@ def update_product(
 ) -> Product:
     if (not current_active_user.isFarmer):
         raise Exception("You do not have permission to update a product.")
-    
-    if product.categoryAtributes == '':
-        product.categoryAtributes = None
 
     with Session(db) as session:
         product = session.exec(select(Product).where(Product.id == product_id)).one()
@@ -140,6 +137,8 @@ def update_product(
                 setattr(product, key, value)
         if isinstance(product.unit, str):
             product.unit = Unit.strToEnum(product.unit)
+        if product.categoryAtributes == '':
+            product.categoryAtributes = None
         session.add(product)
         session.commit()
         session.refresh(product)

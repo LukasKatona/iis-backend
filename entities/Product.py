@@ -36,6 +36,7 @@ class ProductUpdate(SQLModel):
     VAT: Optional[float] = None
     stock: Optional[int] = None
     categoryId: Optional[int] = None
+    categoryAtributes: Optional[str] = None
 
 class ProductWithQuantity(SQLModel):
     product: Product
