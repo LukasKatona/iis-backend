@@ -182,7 +182,7 @@ def delete_order(
             return True
         except Exception as e:
             session.rollback()
-            return False
+            raise HTTPException(status_code=400, detail="Order not found")
 
 @router.delete("/orders/{order_id}/product/{product_id}", response_model=Order, tags=['Orders'])
 def delete_product_from_order(

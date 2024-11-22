@@ -88,7 +88,7 @@ def delete_product_category(
             return True
         except Exception as e:
             session.rollback()
-            raise e;
+            raise HTTPException(status_code=400, detail="Category not found")
         
     
 def delete_child_categories(category: ProductCategory, session: Session):

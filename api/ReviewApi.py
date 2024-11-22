@@ -94,5 +94,5 @@ def delete_review(
             return True
         except:
             session.rollback()
-            return False
+            raise HTTPException(status_code=400, detail="Review not found")
         

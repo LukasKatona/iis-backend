@@ -102,9 +102,9 @@ def delete_event(
             session.delete(event)
             session.commit()
             return True
-        except Exception as e:
+        except:
             session.rollback()
-            return False
+            raise HTTPException(status_code=400, detail="Event not found")
         
 @router.post("/events/{event_id}/join/{user_id}", tags=["Events"])
 def join_event(
@@ -122,7 +122,7 @@ def join_event(
             return True
         except:
             session.rollback()
-            return False
+            raise HTTPException(status_code=400, detail="Event not found")
         
 @router.delete("/events/{event_id}/leave/{user_id}", tags=["Events"])
 def leave_event(
@@ -141,4 +141,4 @@ def leave_event(
             return True
         except Exception as e:
             session.rollback()
-            return False
+            raise HTTPException(status_code=400, detail="Event not found")

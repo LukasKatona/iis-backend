@@ -81,7 +81,7 @@ def delete_category_request(
             return True
         except:
             session.rollback()
-            return False
+            raise HTTPException(status_code=400, detail="Category request not found")
         
             
     

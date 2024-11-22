@@ -1,6 +1,6 @@
 # library imports
 from typing import Annotated, Optional
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import and_, asc, desc
 from sqlmodel import Session, create_engine, select
 
@@ -160,4 +160,4 @@ def delete_product(
             return True
         except Exception as e:
             session.rollback()
-            return False
+            raise HTTPException(status_code=400, detail="Product not found")

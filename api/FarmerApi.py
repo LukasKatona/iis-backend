@@ -103,4 +103,4 @@ def delete_farmer(
             return True
         except:
             session.rollback()
-            return False
+            raise HTTPException(status_code=400, detail="Farmer not found")

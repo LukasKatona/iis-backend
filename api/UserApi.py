@@ -131,4 +131,4 @@ def delete_user(
             return True
         except:
             session.rollback()
-            return False
+            raise HTTPException(status_code=400, detail="User not found")
