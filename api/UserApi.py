@@ -59,12 +59,7 @@ def get_logged_in_user(
     return current_active_user
 
 @router.get("/users/{user_id}", tags=["Users"])
-def get_user_by_id(
-    current_active_user: Annotated[User, Depends(get_current_active_user)],
-    user_id: int) -> User:
-    if (current_active_user.id != user_id) and (not current_active_user.isAdmin):
-        raise HTTPException(status_code=403, detail="You do not have permission to access this resource.")
-    
+def get_user_by_id(user_id: int) -> User:
     with Session(db) as session:
         return session.exec(select(User).where(User.id == user_id)).one()
     
