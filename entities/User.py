@@ -1,6 +1,6 @@
 # library imports
 from typing import Optional
-from sqlalchemy import ForeignKeyConstraint
+from sqlalchemy import ForeignKeyConstraint, UniqueConstraint
 from sqlmodel import Field, SQLModel
 
 class User(SQLModel, table=True):
@@ -27,6 +27,7 @@ class User(SQLModel, table=True):
 
     __table_args__ = (
         ForeignKeyConstraint(["farmerId"], ["farmers.id"], name="users_farmerId_fkey", ondelete="SET NULL"),
+        UniqueConstraint('email', name='unique_email'),
     )
 
 class UserUpdate(SQLModel):

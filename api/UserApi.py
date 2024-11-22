@@ -71,6 +71,10 @@ def create_user(user: User) -> User:
     user.password = get_password_hash(user.password)
     
     with Session(db) as session:
+        existing_user = session.exec(select(User).where(User.email == user.email)).first()
+        if existing_user:
+            raise HTTPException(status_code=409, detail="User with this email already exists.")
+
         session.add(user)
         session.commit()
         session.refresh(user)
@@ -88,6 +92,10 @@ def update_user(
         
         for key, value in user_update.model_dump().items():
             setattr(user, key, value)
+
+        existing_user = session.exec(select(User).where(User.email == user.email)).first()
+        if existing_user and existing_user.id != user_id:
+            raise HTTPException(status_code=409, detail="User with this email already exists.")
 
         session.commit()
         session.refresh(user)
