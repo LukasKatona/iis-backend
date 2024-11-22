@@ -244,3 +244,23 @@ def get_products_of_order(
                 ).first()
                 products_with_quantity.append(ProductWithQuantity(product=product, quantity=relation.quantity, review=product_review))
         return products_with_quantity
+
+@router.get("/orders/number-of-products", response_model=int, tags=["Orders"])
+def get_number_of_products_in_my_order(
+    current_active_user: Annotated[User, Depends(get_current_active_user)]):
+    with Session(db) as session:
+        my_orders = session.exec(
+            select(Order).where(Order.userId == current_active_user.id, Order.status == OrderStatus.IN_CART)
+        ).all()
+
+        if not my_orders:
+            return 0
+
+        sum = 0
+        for order in my_orders:
+            relations = session.exec(
+                select(OrderProductRelation).where(OrderProductRelation.orderId == order.id)
+            ).all()
+            sum += len(relations)
+
+        return sum
