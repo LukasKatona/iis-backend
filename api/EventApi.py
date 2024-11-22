@@ -103,7 +103,6 @@ def delete_event(
             session.commit()
             return True
         except Exception as e:
-            print(e)
             session.rollback()
             return False
         
@@ -141,6 +140,5 @@ def leave_event(
             session.commit()
             return True
         except Exception as e:
-            print(e)
             session.rollback()
             return False
