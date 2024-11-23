@@ -1,40 +1,32 @@
 # library imports
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy import URL
-from sqlmodel import Session, create_engine, select
 
 # local imports
-from entities.Product import ProductCategory
-
-connection_string = URL.create(
-    'postgresql',
-    username='admin',
-    password='pgtvTuwoV5G7',
-    host='ep-wild-mode-a2zrk2og.eu-central-1.pg.koyeb.app',
-    database='koyebdb',
-)
-
-db = create_engine(connection_string)
+from api import ProductCategoryApi, ProductApi, EventApi, UserApi, FarmerApi, ReviewApi, OrderApi, NewCategoryRequestApi
+import auth
 
 app = FastAPI()
 
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Adjust as needed, "*" allows all origins
+    allow_origins=[
+        "http://localhost:4200",
+        "http://www.stud.fit.vutbr.cz/~xkaton00/IIS"
+    ],
     allow_credentials=True,
-    allow_methods=["*"],  # Adjust allowed methods (GET, POST, etc.)
-    allow_headers=["*"],  # Adjust allowed headers
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
-@app.get("/product-categories")
-def get_product_categories() -> list[ProductCategory]:
-    with Session(db) as session:
-        return list(session.exec(select(ProductCategory)))
-
-    
-@app.get("/product-categories/{category_id}")
-def get_product_category_by_id(category_id: int) -> ProductCategory:
-    with Session(db) as session:
-        return session.exec(select(ProductCategory).where(ProductCategory.id == category_id)).first()
+# Include routers
+app.include_router(auth.router)
+app.include_router(ProductCategoryApi.router)
+app.include_router(ProductApi.router)
+app.include_router(EventApi.router)
+app.include_router(UserApi.router)
+app.include_router(FarmerApi.router)
+app.include_router(ReviewApi.router)
+app.include_router(OrderApi.router)
+app.include_router(NewCategoryRequestApi.router)

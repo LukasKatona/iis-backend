@@ -1,32 +1,44 @@
 # library imports
 from typing import Optional
-import sqlalchemy as sa
-from pydantic import BaseModel
-from sqlmodel import Field, SQLModel, Relationship
+from sqlalchemy import ForeignKeyConstraint
+from sqlmodel import Field, SQLModel
 
 # local imports
 from enums.Unit import Unit
+from entities.Review import Review
 
 class Product(SQLModel, table=True):
     __tablename__ = 'products'
     id: int = Field(default=None, primary_key=True)
     name: str
-    imageUrl: str
-    unit: Unit
-    unitPrice: float
-    stock: int
-    categoryId : int = Field(default=None, foreign_key="product_categories.id", index=True, nullable=True)
+    imageUrl: str = Field(nullable=True)
+    unit: Unit = Field(default=Unit.KILOGRAM)
+    unitPrice: float = Field(default=0.0)
+    VAT: float = Field(default=0.0)
+    stock: int = Field(default=0)
+    categoryId : int = Field(default=None, index=True, nullable=True)
+    farmerId: int = Field(default=None, index=True)
+    categoryAtributes: str = Field(default=None, nullable=True)
 
-class ProductCategory(SQLModel, table=True):
-    __tablename__ = 'product_categories'
-    id: int = Field(default=None, primary_key=True)
-    name: str
-    parentCategoryId: int = Field(default=None, foreign_key="product_categories.id", nullable=True)
+    __table_args__ = (
+        ForeignKeyConstraint(["categoryId"], ["product_categories.id"], name="products_categoryId_fkey", ondelete="SET NULL"),
+        ForeignKeyConstraint(["farmerId"], ["farmers.id"], name="products_farmerId_fkey", ondelete="CASCADE"),
+    )
 
-    parentCategory: Optional["ProductCategory"] = Relationship(back_populates="childCategories", sa_relationship_kwargs={"remote_side": "ProductCategory.id"})
-    childCategories: list["ProductCategory"] = Relationship(back_populates="parentCategory")
+class ProductWithRating(Product):
+    rating: float
 
-# relationships
+class ProductUpdate(SQLModel):
+    name: Optional[str] = None
+    imageUrl: Optional[str] = None
+    unit: Optional[Unit] = None
+    unitPrice: Optional[float] = None
+    VAT: Optional[float] = None
+    stock: Optional[int] = None
+    categoryId: Optional[int] = None
+    categoryAtributes: Optional[str] = None
 
-Product.category = Relationship(back_populates="products")
-ProductCategory.products = Relationship(back_populates="category")
+class ProductWithQuantity(SQLModel):
+    product: Product
+    quantity: int
+    review: Optional[Review] = None
