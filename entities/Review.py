@@ -8,7 +8,7 @@ class Review(SQLModel, table=True):
     productId: int = Field(default=None, index=True, nullable=True)
     orderId: int = Field(default=None, index=True, nullable=True)
     rating: int
-    createdAt: str
+    createdAt: float
 
     __table_args__ = (
         ForeignKeyConstraint(["userId"], ["users.id"], name="reviews_userId_fkey", ondelete="CASCADE"),
