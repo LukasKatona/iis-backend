@@ -12,12 +12,12 @@ app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:4200/*",
-        "https://www.stud.fit.vutbr.cz/~xkaton00/*",
-        "http://www.stud.fit.vutbr.cz/~xkaton00/*"
+        "http://localhost:4200",  
+        "https://www.stud.fit.vutbr.cz/~xkaton00",
+        "http://www.stud.fit.vutbr.cz/~xkaton00"
     ],
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
 
