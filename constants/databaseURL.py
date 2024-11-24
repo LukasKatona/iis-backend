@@ -3,7 +3,7 @@ from sqlalchemy import URL
 DATABASE_URL = URL.create(
     'postgresql',
     username='koyeb-adm',
-    password='xkcAdt5aF4zL',
-    host='ep-lingering-surf-a2irdt6k.eu-central-1.pg.koyeb.app',
+    password='x3U2PFETcZwY',
+    host='ep-tiny-sun-a2xdq8fh.eu-central-1.pg.koyeb.app',
     database='koyebdb',
 )
