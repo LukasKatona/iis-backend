@@ -13,7 +13,8 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:4200",
-        "https://www.stud.fit.vutbr.cz/*"  
+        "https://www.stud.fit.vutbr.cz/",
+        "http://www.stud.fit.vutbr.cz/",   
         "https://www.stud.fit.vutbr.cz/~xkaton00/#/*",
         "http://www.stud.fit.vutbr.cz/~xkaton00/#/*"
     ],
