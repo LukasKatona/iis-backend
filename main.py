@@ -12,6 +12,7 @@ app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
+        "*",
         "http://localhost:4200",
         "https://www.stud.fit.vutbr.cz/~xkaton00/IIS",
         "https://www.stud.fit.vutbr.cz/~xkaton00",
