@@ -14,9 +14,7 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:4200",
         "https://www.stud.fit.vutbr.cz",
-        "http://www.stud.fit.vutbr.cz",   
-        "https://www.stud.fit.vutbr.cz/~xkaton00/#/*",
-        "http://www.stud.fit.vutbr.cz/~xkaton00/#/*"
+        "http://www.stud.fit.vutbr.cz",
     ],
     allow_credentials=True,
     allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
