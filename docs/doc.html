@@ -1,0 +1,510 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<title>Projekt IIS</title>
+	<style type="text/css">
+		table {
+			border-collapse: collapse;
+		}
+
+		td,
+		th {
+			border: 1px solid black;
+			padding: 0.3em 0.5em;
+			text-align: left;
+		}
+
+		dt {
+			font-weight: bold;
+			margin-top: 0.5em;
+		}
+	</style>
+</head>
+
+<body>
+
+	<!-- Zkontrolujte prosím nastavení kódování v hlavičce dokumentu 
+     podle použitého editoru -->
+
+	<h1>Zelný trh</h1> <!-- Nahradte názvem svého zadání -->
+
+	<dl>
+		<dt>Autoři</dt>
+		<dd>Lukáš Katona <!-- Nahraďte skutečným jménem a e-mailem autora a popisem činnosti -->
+			<a href="mailto:xkaton00@stud.fit.vutbr.cz">xkaton00@stud.fit.vutbr.cz</a> <br>
+			backend:
+			<ul>
+				<li>Event, Farmer, Product, ProductCategory, User Api</li>
+				<li>Event, Farmer, Product, ProductCategory, User, UserEventRelation ORM modely</li>
+				<li>Auth.py - obsahuje metody na autentiazce a autentifikaci uživatele</li>
+				<li>db-init.py - inicializace databáze</li>
+			</ul>
+			frontend:
+			<ul>
+				<li>Základní rozložení stránky</li>
+				<li>Login dialog</li>
+				<li>Prohlížení nabídky produktů</li>
+				<li>Filtrování atributů podle dané kategorie</li>
+				<li>Úprava osobních informací přihlášeného uživatele</li>
+				<li>Správa událostí, vytváření a editování, přidání do oblíbených</li>
+				<li>Správa kategorií produktů a vytváření návrhu na nové kategorie</li>
+			</ul>
+		</dd>
+		<dd>Klára Kejdová <!-- Nahraďte skutečným jménem a e-mailem autora a popisem činnosti -->
+			<a href="mailto:xkejdo00@stud.fit.vutbr.cz">xkejdo00@stud.fit.vutbr.cz</a> <br>
+			backend:
+			<ul>
+				<li>NewCategoryRequest, Order, Review Api</li>
+				<li>NewCategoryRequest, Order, Review, OrderProductRelation ORM modely</li>
+				<li>db-init.py - inicializace databáze</li>
+			</ul>
+			frontend:
+			<ul>
+				<li>Register dialog</li>
+				<li>Vytváření nabídky produktů</li>
+				<li>Filtrování a vyhledávání produktů podle základních atributů</li>
+				<li>Přidávání produktů do košíku</li>
+				<li>Stránka nákupního košíku s moností úpravy jednotlivých položek</li>
+				<li>Administrativní stránka na správu jednoltivých uživatelů a jejich rolí</li>
+				<li>Stránka s příchozími a odchozími objednávkami</li>
+			</ul>
+			dokumentace
+
+		</dd>
+
+		<dt>URL aplikace</dt>
+		<dd><a href="http://www.stud.fit.vutbr.cz/~xkaton00/IIS/">http://www.stud.fit.vutbr.cz/~xkaton00/IIS/</a></dd>
+		<dd>(pokud má aplikace více vstupních stránek, napište obdobně další URL)</dd>
+	</dl>
+
+	<h2>Uživatelé systému pro testování</h2>
+	<p>Uveďte prosím existující zástupce <strong>všech rolí uživatelů</strong>.</p>
+	<table>
+		<tr>
+			<th>Login</th>
+			<th>Heslo</th>
+			<th>Role</th>
+		</tr>
+		<tr>
+			<td>jd@gmail.com</td>
+			<td>password</td>
+			<td>Administrátor</td>
+		</tr>
+		<tr>
+			<td>es@gmail.com</td>
+			<td>password</td>
+			<td>Moderátor</td>
+		</tr>
+		<tr>
+			<td>sw@gmail.com</td>
+			<td>password</td>
+			<td>Farmář</td>
+		</tr>
+		<tr>
+			<td>jb@gmail.com</td>
+			<td>password</td>
+			<td>Zákazník</td>
+		</tr>
+		<tr>
+			<td>od@gmail.com</td>
+			<td>password</td>
+			<td>Neaktivní uživatel</td>
+		</tr>
+	</table>
+
+	<h3>Video</h3>
+
+	<p>Přiložte odkaz na komentované video demostrující použití informačního systému. Zaměřte se na případy užití
+		definované zadáním (např. registrace uživatele, správa uživatelů a činnosti jednotlivých rolí). Video nahrajte
+		například na VUT Google Drive, kde ho bude možné přímo spustit z odkazu.</p>
+
+	<h2>Implementace</h2>
+
+	Projekt je rozdělen do dvou částí, backend a frontend. Backend je napsán v jazyce Python s použitím FastAPI,
+	SQLAlchemy, SQLModel, frontend je napsán pomocí frameworku Angular s použitím standalone komponent. Databáze je typu
+	PostgreSQL.<br>
+	Na beckenndu jsou ve složce "entities" implementovány ORM modely User, Farmer, Product, Category, Order, Review,
+	Event, NewCategoryRequest včetně entit vztahů, které reprezentují jednotlivé entity v databázi. Uživatel definuje
+	základní entitu osoby, která může mít nastavené vlastnosti jako moderátor, či administrátor. Entita farmář pak tento
+	model rozšiřuje. <br>
+	Pak se zde nachází druhá hlavní složka "api" kde jsou implementovány jednotlivé endpointy, které zajišťují
+	komunikaci mezi frontendem a backendem. Jednotlivé soubory jsou přehledně rozděleny podle entit. <br>
+
+	Na frontendu je složka "app", v níž se nachází primární komponenty stránky a složky, "components", "services" a
+	"interceptors". Složka "components" obsahuje konkrétní částí stránek, ve složce "services" se nachází služba
+	AuthStoreService, která drží akutální data přihlášeného uživatele na straně klienta. Poslední složkou je
+	"interceptors", kde je uložen AuthInterceptor, který do všech Http požadavků vkládá hlavičku autorizace s tokenem
+	přihlášeného uživatele a zpracovává errory odpovědí. <br>
+
+	Role uživatelů jsou rozděleny na 5 základních skupin: Administrátor, Moderátor, Prodavač (Farmář) a Zákazník či
+	nepřihlášený uživatel. <br>
+
+	<p>User endopinty: UserApi.py</p>
+	<ul>
+		<li>GET /users </li>
+		<ul>
+			<li>Práva: administrátor</li>
+			<li>Použítí: přehled všech uživatelů na admin stránce</li>
+		</ul>
+		<li>GET /users/me</li>
+		<ul>
+			<li>Práva: aktuálně přihlášený uživatel</li>
+			<li>Použití: pro uložení aktuálně přihlášeného uživatele do authStore</li>
+		</ul>
+		<li>GET /users/user_id</li>
+		<ul>
+			<li>Práva: všichni</li>
+			<li>Použití: banner informací o farmáři,</li>
+		</ul>
+		<li>POST /users</li> <!-- ?? -->
+		<ul>
+			<li>Práva: administrátor</li>
+			<li>Použití: vytvoření nového uživatele</li>
+		</ul>
+		<li>PATCH /users/user_id</li>
+		<ul>
+			<li>Práva: administrátor, přihlíšený uživatel (pouze své informace)</li>
+			<li>Použití: formulář osobních informací</li>
+		</ul>
+		<li>PATCH /users/user_id/password</li>
+		<ul>
+			<li>Práva: administrátor, přihlíšený uživatel (pouze své heslo)</li>
+			<li>Použití: formulář změny hesla</li>
+		</ul>
+		<li>DELETE /users/user_id</li>
+		<ul>
+			<li>Práva: administrátor</li>
+			<li>Použití: smazání uživatele</li>
+		</ul>
+	</ul>
+
+	<p>Farmer endopinty: FarmerApi.py</p>
+	<ul>
+		<li>GET /farmers</li>
+		<ul>
+			<li>Práva: všichni</li>
+			<li>Použití: přehled všech farmářů na amdin stránce, stránky produtků podle farmářů, osobní informace
+				uživatele</li>
+		</ul>
+		<li>GET /farmers/farmer_id</li>
+		<ul>
+			<li>Práva: všichni</li>
+			<li>Použití: banner informací o farmáři</li>
+		</ul>
+		<li>GET /farmers/user_id/by-user-id</li>
+		<ul>
+			<li>Práva: aktuálně přihlášený uživatel, administrátor</li>
+			<li>Použití: přehled produktů farmáře, osobní informace</li>
+		</ul>
+		<li>POST /farmers</li>
+		<ul>
+			<li>Práva: farmář který je akutuálně přihlášený uživatel, administrátor</li>
+			<li>Použití: vytvoření nového farmáře</li>
+		</ul>
+		<li>PATCH /farmers/farmer_id</li>
+		<ul>
+			<li>Práva: farmář který je akutuálně přihlášený uživatel</li>
+			<li>Použití: úprava vlastního profilu</li>
+		</ul>
+		<li>DELETE /farmers/farmer_id</li>
+		<ul>
+			<li>Práva: administrátor</li>
+			<li>Použití: smazání vlastního profilu</li>
+		</ul>
+	</ul>
+
+	<p>Product endopinty: ProductApi.py</p>
+	<ul>
+		<li>GET /products</li>
+		<ul>
+			<li>Práva: všichni</li>
+			<li>Použití: přehled všech produktů na stránce</li>
+		</ul>
+		<li>GET /products/product_id</li>
+		<ul>
+			<li>Práva: všichni</li>
+			<li>Použití: přidávání produktů, karty produktů</li>
+		</ul>
+		<li>GET /products/most-popular</li>
+		<ul>
+			<li>Práva: všichni</li>
+			<li>Použití: boční panel populárních produktů</li>
+		</ul>
+		<li>POST /products</li>
+		<ul>
+			<li>Práva: farmář</li>
+			<li>Použití: vytvoření nového produktu</li>
+		</ul>
+		<li>PATCH /products/product_id</li>
+		<ul>
+			<li>Práva: farmář</li>
+			<li>Použití: úprava vlastního produktu</li>
+		</ul>
+		<li>DELETE /products/product_id</li>
+		<ul>
+			<li>Práva: farmář</li>
+			<li>Použití: smazání vlastního produktu</li>
+		</ul>
+	</ul>
+
+	<p>Order endopinty: OrderApi.py</p>
+	<ul>
+		<li>GET /orders</li>
+		<ul>
+			<li>Práva: přihlášený uživatel</li>
+			<li>Použití: přehled všech příchozích i odchozích objednávek, objednávky v košíku</li>
+		</ul>
+		<li>GET /orders/order_id/products</li>
+		<ul>
+			<li>Práva: přihlášený uživatel</li>
+			<li>Použití: přehled produktů v objednávce</li>
+		</ul>
+		<li>GET orders/number-of-products</li>
+		<ul>
+			<li>Práva: přihlášený uživatel</li>
+			<li>Použití: počet produktů v košíku</li>
+		</ul>
+		<li>PATCH orders/order_id/status</li>
+		<ul>
+			<li>Práva: přihlášený uživatel</li>
+			<li>Použití: změna stavu objednávky - košík/objednáno, pro farmáře status odeslání</li>
+		</ul>
+		<li>POST /orders/add-product</li>
+		<ul>
+			<li>Práva: přihlášený uživatel</li>
+			<li>Použití: přidání produktu do košíku</li>
+		</ul>
+		<li>PATCH /orders/order_id/edit-product</li>
+		<ul>
+			<li>Práva: přihlášený uživatel</li>
+			<li>Použití: úprava produktu v košíku</li>
+		</ul>
+		<li>DELETE /orders/order_id</li>
+		<ul>
+			<li>Práva: přihlášený uživatel</li>
+			<li>Použití: smazání produktu z košíku</li>
+		</ul>
+		<li>DELETE /orders/order_id/product/product_id</li>
+		<ul>
+			<li>Práva: přihlášený uživatel</li>
+			<li>Použití: smazání produktu z košíku</li>
+		</ul>
+	</ul>
+
+	<p>Category endopinty v ProductsCategoryApi.py</p>
+	<ul>
+		<li>GET /product-categories</li>
+		<ul>
+			<li>Práva: všichni</li>
+			<li>Použití: přehled všech kategorií na stránce</li>
+		</ul>
+		<li>PATCH /product-categories/category_id</li>
+		<ul>
+			<li>Práva: administrátor, moderátor</li>
+			<li>Použití: upravení nové kategorie a jejich atributů</li>
+		</ul>
+		<li>POST /product-categories</li>
+		<ul>
+			<li>Práva: administrátor, moderátor</li>
+			<li>Použití: vytvoření nové kategorie</li>
+		</ul>
+		<li>DELETE /product-categories/category_id</li>
+		<ul>
+			<li>Práva: administrátor, moderátor</li>
+			<li>Použití: smazání kategorie</li>
+		</ul>
+	</ul>
+
+	<p>Event endopinty v EventApi.py</p>
+	<ul>
+		<li>GET /events</li>
+		<ul>
+			<li>Práva: všichni</li>
+			<li>Použití: přehled všech událostí na stránce</li>
+		</ul>
+		<li>GET /events/user_id</li> <!-- ?? -->
+		<ul>
+			<li>Práva: přihlášený uživatel</li>
+			<li>Použití: přehled událostí konrténího farmáře</li>
+		</ul>
+		<li>POST /events</li>
+		<ul>
+			<li>Práva: farmář</li>
+			<li>Použití: vytvoření nové události</li>
+		</ul>
+		<li>PATCH /events/event_id</li>
+		<ul>
+			<li>Práva: farmář</li>
+			<li>Použití: úprava vlastních události</li>
+		</ul>
+		<li>DELETE /events/event_id</li>
+		<ul>
+			<li>Práva: farmář</li>
+			<li>Použití: smazání vlastní události</li>
+		</ul>
+		<li>POST /events/event_id/join/user_id</li>
+		<ul>
+			<li>Práva: přihlášený uživatel</li>
+			<li>Použití: přidání sebe samého do události</li>
+		</ul>
+		<li>DELETE /events/event_id/join/user_id</li>
+		<ul>
+			<li>Práva: přihlášený uživatel</li>
+			<li>Použití: odebrání sebe samého z události</li>
+		</ul>
+	</ul>
+
+	<p>Review endopinty v ReviewApi.py</p>
+	<ul>
+		<li>GET /reviews</li>
+		<ul>
+			<li>Práva: všichni</li>
+			<li>Použití: přehled všech recenzí na stránce u produktů a v "nejvíce populární" baneru</li>
+		</ul>
+		<li>POST /reviews</li>
+		<ul>
+			<li>Práva: přihlášený uživatel</li>
+			<li>Použití: vytvoření nové recenze u zakoupených produktů</li>
+		</ul>
+		<li>PATCH /reviews/review_id</li>
+		<ul>
+			<li>Práva: přihlášený uživatel</li>
+			<li>Použití: úprava vlastní recenze</li>
+		</ul>
+		<li>DELETE /reviews/review_id</li>
+		<ul>
+			<li>Práva: přihlášený uživatel</li>
+			<li>Použití: smazání vlastní recenze</li>
+		</ul>
+	</ul>
+
+	<p>NewCategoryRequest endopinty v NewCategoryRequestApi.py</p>
+	<ul>
+		<li>GET /category-requests</li>
+		<ul>
+			<li>Práva: přihlášení uživatelé</li>
+			<li>Použití: stránka moderátora na správu návrhů, uživatelský přehled návrhů kategorií</li>
+		</ul>
+		<li>POST /category-requests</li>
+		<ul>
+			<li>Práva: přihlášený uživatel</li>
+			<li>Použití: vytvoření nového návrhu kategorie</li>
+		</ul>
+		<li>PATCH /category-requests/category_id</li>
+		<ul>
+			<li>Práva: administrátor, moderátor</li>
+			<li>Použití: schválení návrhu kategorie</li>
+		</ul>
+		<li>DELETE /category-requests/category_id</li>
+		<ul>
+			<li>Práva: administrátor, moderátor</li>
+			<li>Použití: smazání návrhu kategorie</li>
+		</ul>
+	</ul>
+
+
+
+
+
+
+	<h3>Databáze</h3>
+
+	<img src="databasee-scheme.png" alt="Schéma databáze" />
+
+	<h2>Instalace</h2>
+
+	Postup instalace na server
+	<ul>
+		<li>Server hostujeme pomocí internetové služby Koyeb </li>
+		<li>Server se nasazuje ze zvolené větve z připojeného github repozitáře</li>
+		<li>Důležitou částí je soubor reqirements.txt, který obsahuje verze použitých knihoven</li>
+		<li>Služba Koyeb vytvoří virtuální prostředí ve kterérm nainstaluje požadované knihovny</li>
+		<li>Ve virtuáulním prostředí se spustí server pomocí služby Uvicorn</li>
+	</ul>
+	Softwarové požadavky
+	<ul>
+		<li>Beckend - Python 3.11.9</li>
+		<ul>
+			<li>annotated-types==0.7.0</li>
+			<li>anyio==4.6.0</li>
+			<li>bcrypt==4.2.0</li>
+			<li>click==8.1.7</li>
+			<li>colorama==0.4.6</li>
+			<li>fastapi==0.115.0</li>
+			<li>greenlet==3.1.1</li>
+			<li>h11==0.14.0</li>
+			<li>httptools==0.6.1</li>
+			<li>idna==3.10</li>
+			<li>passlib==1.7.4</li>
+			<li>psycopg2==2.9.9</li>
+			<li>pydantic==2.9.2</li>
+			<li>pydantic_core==2.23.4</li>
+			<li>PyJWT==2.9.0</li>
+			<li>python-dotenv==1.0.1</li>
+			<li>python-multipart==0.0.17</li>
+			<li>PyYAML==6.0.2</li>
+			<li>sniffio==1.3.1</li>
+			<li>SQLAlchemy==2.0.35</li>
+			<li>sqlmodel==0.0.22</li>
+			<li>starlette==0.38.6</li>
+			<li>typing_extensions==4.12.2</li>
+			<li>uvicorn==0.31.0</li>
+			<li>watchfiles==0.24.0</li>
+			<li>websockets==13.1</li>
+		</ul>
+		<li>Frontend - Angular 18.2.6 </li>
+		<ul>
+			<li>dependencies</li>
+			<ul>
+				<li>@angular/animations: ^18.2.0</li>
+				<li>@angular/cdk: ^18.2.8</li>
+				<li>@angular/common: ^18.2.0</li>
+				<li>@angular/compiler: ^18.2.0</li>
+				<li>@angular/core: ^18.2.0</li>
+				<li>@angular/forms: ^18.2.0</li>
+				<li>@angular/platform-browser: ^18.2.0</li>
+				<li>@angular/platform-browser-dynamic: ^18.2.0</li>
+				<li>@angular/router: ^18.2.0</li>
+				<li>mdui: ^2.1.3</li>
+				<li>remixicon: ^4.5.0</li>
+				<li>rxjs: ~7.8.0</li>
+				<li>tslib: ^2.3.0</li>
+				<li>zone.js: ~0.14.10</li>
+			</ul>
+			<li>devDependencies</li>
+			<ul>
+				<li>@angular-devkit/build-angular: ^18.2.6</li>
+				<li>@angular/cli: ^18.2.6</li>
+				<li>@angular/compiler-cli: ^18.2.0</li>
+				<li>@types/jasmine: ~5.1.0</li>
+				<li>jasmine-core: ~5.2.0</li>
+				<li>karma: ~6.4.0</li>
+				<li>karma-chrome-launcher: ~3.2.0</li>
+				<li>karma-coverage: ~2.2.0</li>
+				<li>karma-jasmine: ~5.1.0</li>
+				<li>karma-jasmine-html-reporter: ~2.1.0</li>
+				<li>typescript: ~5.5.2</li>
+			</ul>
+		</ul>
+		Jak rozbalit, konfigurovat, inicializovat databázi:
+		<ul>
+			<li>Databázový server hostujeme pomocí služby Koyeb</li>
+			<li>Na webové stránce koyeb.com si můžeme zobrazit přihlašovací údaje a vytvořit si nové přístupy do
+				databáze</li>
+			<li>Databázi lze konfigurovat v libovolném software, v našem případě jsme použili DBeaver</li>
+			<li>Relace v databázi byly vytvořeny pomocí ORM modelů napsaných v backend části projektu</li>
+			<li>Na inicializaci databáze jsme použili skript db-init.py, který tabulky na základě napsaných ORM modelů a
+				naplní databázi seedovacími daty</li>
+		</ul>
+
+
+		<h2>Známé problémy</h2>
+		<p>
+			SSl connectino error.
+		</p>
+
+</body>
+
+</html>
