@@ -26,7 +26,7 @@ def create_product_category(
     current_active_user: Annotated[User, Depends(get_current_active_user)],
     category: ProductCategory) -> ProductCategory:
     if (not current_active_user.isAdmin) and (not current_active_user.isModerator):
-        raise Exception("You do not have permission to create a product category.")
+        raise HTTPException(status_code=403, detail="You do not have permission to create a product category.")
 
     with Session(db) as session:
         session.add(category)
@@ -41,7 +41,7 @@ def update_product_category(
     category_update: ProductCategoryUpdate
 ) -> ProductCategory:
     if (not current_active_user.isAdmin) and (not current_active_user.isModerator):
-        raise Exception("You do not have permission to update a product category.")
+        raise  HTTPException(status_code=403, detail="You do not have permission to update a product category.")
 
     with Session(db) as session:
         category = session.exec(select(ProductCategory).where(ProductCategory.id == category_id)).one()
@@ -68,7 +68,7 @@ def delete_product_category(
     category_id: int,
 ) -> bool:
     if (not current_active_user.isAdmin) and (not current_active_user.isModerator):
-        raise Exception("You do not have permission to delete a product category.")
+        raise HTTPException(status_code=403, detail="You do not have permission to delete a product category.")
 
     with Session(db) as session:
         try:

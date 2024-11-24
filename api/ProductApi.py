@@ -108,7 +108,7 @@ def create_product(
     current_active_user: Annotated[User, Depends(get_current_active_user)],
     product: Product) -> Product:
     if (not current_active_user.isFarmer):
-        raise Exception("You do not have permission to create a product.")
+        raise HTTPException(status_code=403, detail="You do not have permission to create a product.")
     
     if product.categoryAtributes == '':
         product.categoryAtributes = None
@@ -128,10 +128,14 @@ def update_product(
     product_update: ProductUpdate
 ) -> Product:
     if (not current_active_user.isFarmer):
-        raise Exception("You do not have permission to update a product.")
+        raise HTTPException(status_code=403, detail="You do not have permission to update a product.")
 
     with Session(db) as session:
         product = session.exec(select(Product).where(Product.id == product_id)).one()
+
+        if (product.farmerId != current_active_user.farmerId):
+            raise HTTPException(status_code=403, detail="You do not have permission to update this product.")
+
         for key, value in product_update.model_dump().items():
             if value is not None:
                 setattr(product, key, value)
@@ -150,11 +154,15 @@ def delete_product(
     product_id: int,
 ) -> bool:
     if (not current_active_user.isFarmer):
-        raise Exception("You do not have permission to delete a product.")
+        raise HTTPException(status_code=403, detail="You do not have permission to delete a product.")
     
     with Session(db) as session:
         try:
             product = session.exec(select(Product).where(Product.id == product_id)).one()
+
+            if (product.farmerId != current_active_user.farmerId):
+                raise HTTPException(status_code=403, detail="You do not have permission to delete this product.")
+            
             session.delete(product)
             session.commit()
             return True
