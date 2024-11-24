@@ -13,7 +13,7 @@ from constants.databaseURL import DATABASE_URL
 router = APIRouter()
 db = create_engine(DATABASE_URL)
 
-formatted_date = datetime.now().strftime("%Y-%m-%d %H:%M")
+formatted_date = datetime.timestamp(datetime.now())
 
 @router.get("/reviews", response_model=List[Review], tags=["Reviews"])
 def get_reviews(userIdFilter: Optional[int] = Query(None), productIdFilter: Optional[int] = Query(None), orderIdFilter: Optional[int] = Query(None)) -> List[Review]:

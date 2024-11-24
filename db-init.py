@@ -50,37 +50,43 @@ def main() -> None:
     with Session() as session:
         print("Inserting users")
         session.add_all([
-            User(name="John", surname="Doe", isModerator=True, email="jd@gmail.com", password=get_password_hash("password"), phone="+421908111222", state="Slovenská republika", city="Bratislava", street="Mlynské nivy", streetNumber="45", zipCode="821 09"),
-            User(name="Emma", surname="Smith", isAdmin=True, email="es@gmail.com", password=get_password_hash("password"), phone="+421908111223", state="Slovenská republika", city="Košice", street="Hlavná", streetNumber="1", zipCode="040 01"),
-            User(name="Michael", surname="Johnson", email="mj@gmail.com", password=get_password_hash("password"), phone="+421908111224", state="Slovenská republika", city="Žilina", street="Námestie A. Hlinku", streetNumber="1", zipCode="010 01"),
+            # Admin
+            User(name="John", surname="Doe", isAdmin=True, email="jd@gmail.com", password=get_password_hash("password"), phone="+421908111222", state="Slovenská republika", city="Bratislava", street="Mlynské nivy", streetNumber="45", zipCode="821 09"),
+            # Moderator
+            User(name="Emma", surname="Smith", isModerator=True, email="es@gmail.com", password=get_password_hash("password"), phone="+421908111223", state="Slovenská republika", city="Košice", street="Hlavná", streetNumber="1", zipCode="040 01"),
+            # Farmers
             User(name="Sophia", surname="Williams", email="sw@gmail.com", password=get_password_hash("password"), phone="+420777111222", state="Česká republika", city="Brno", street="Náměstí Svobody", streetNumber="1", zipCode="602 00"),
+            User(name="Amanda", surname="Welth", email="aw@gmail.com", password=get_password_hash("password"), phone="+420778111222", state="Česká republika", city="Brno", street="Česká", streetNumber="8", zipCode="602 00"),
+            User(name="Michael", surname="Johnson", email="mj@gmail.com", password=get_password_hash("password"), phone="+420777111221", state="Česká republika", city="Brno", street="Koliště", streetNumber="8", zipCode="602 00"),
+            # Customer
             User(name="James", surname="Brown", email="jb@gmail.com", password=get_password_hash("password"), phone="+420777111223", state="Česká republika", city="Praha", street="Václavské náměstí", streetNumber="1", zipCode="110 00"),
+            # Inactive user
             User(name="Olivia", surname="Davis", isActive=False, email="od@gmail.com", password=get_password_hash("password"), phone="+420777111224", state="Česká republika", city="Ostrava", street="Masarykovo náměstí", streetNumber="1", zipCode="702 00"),
         ])
         session.commit()
 
         print("Inserting farmers")
-        user1 = session.query(User).filter_by(name="John").first()
-        user2 = session.query(User).filter_by(name="Emma").first()
-        user3 = session.query(User).filter_by(name="Sophia").first()
+        sophia = session.query(User).filter_by(email="sw@gmail.com").one()
+        amanda = session.query(User).filter_by(email="aw@gmail.com").one()
+        michael = session.query(User).filter_by(email="mj@gmail.com").one()
         session.add_all([
-            Farmer(userId=user1.id, farmName="John's Farm", description="We are a small family farm located in the heart of Bratislava. We grow a variety of vegetables and fruits and we are proud to offer our customers the freshest produce.", CIN="12345678", VATIN="12345678", VAT="SK12345678", paysVat=True, bankCode="123", accountNumber="1234567890", state="Slovenská republika", city="Bratislava", street="Vajnorská", streetNumber="100", zipCode="831 04"),
-            Farmer(userId=user2.id, farmName="Emma's Farm", description="We are a small family farm located in the heart of Bratislava. We grow a variety of vegetables and fruits and we are proud to offer our customers the freshest produce.", CIN="12345679", VATIN="12345679", VAT="SK12345679", paysVat=True, bankCode="124", accountNumber="1234567891", state="Slovenská republika", city="Košice", street="Orlia", streetNumber="1", zipCode="040 01"),
-            Farmer(userId=user3.id, farmName="Sophia's Farm", description="We are a small family farm located in the heart of Brno. We grow a variety of vegetables and fruits and we are proud to offer our customers the freshest produce.", CIN="12345680", VATIN="CZ12345680", VAT="CZ12345678", paysVat=True, bankCode="125", accountNumber="1234567892", state="Česká republika", city="Brno", street="Haškova", streetNumber="1", zipCode="602 00"),
+            Farmer(userId=sophia.id, farmName="Sophia's Farm", description="We are a small family farm located in the heart of Brno. We grow a variety of vegetables and fruits and we are proud to offer our customers the freshest produce.", CIN="12345680", VATIN="CZ12345680", VAT="CZ12345678", paysVat=True, bankCode="125", accountNumber="1234567892", state="Česká republika", city="Brno", street="Haškova", streetNumber="1", zipCode="602 00"),
+            Farmer(userId=amanda.id, farmName="Amanda's Farm", description="We are a small family farm located in the heart of Brno. We grow a variety of vegetables and fruits and we are proud to offer our customers the freshest produce.", CIN="12345681", VATIN="CZ12345681", VAT="CZ12345679", paysVat=True, bankCode="126", accountNumber="1234567893", state="Česká republika", city="Brno", street="Haškova", streetNumber="2", zipCode="602 00"),
+            Farmer(userId=michael.id, farmName="Michael's Farm", description="We are a small family farm located in the heart of Brno. We grow a variety of vegetables and fruits and we are proud to offer our customers the freshest produce.", CIN="12345682", VATIN="CZ12345682", VAT="CZ12345680", paysVat=True, bankCode="127", accountNumber="1234567894", state="Česká republika", city="Brno", street="Haškova", streetNumber="3", zipCode="602 00"),
         ])
         session.commit()
 
         print("Updating users with farmerId")
-        farmer1 = session.query(Farmer).filter_by(farmName="John's Farm").first()
-        farmer2 = session.query(Farmer).filter_by(farmName="Emma's Farm").first()
-        farmer3 = session.query(Farmer).filter_by(farmName="Sophia's Farm").first()
-        user1.farmerId = farmer1.id
-        user1.isFarmer = True
-        user2.farmerId = farmer2.id
-        user2.isFarmer = True
-        user3.farmerId = farmer3.id
-        user3.isFarmer = True
-        session.add_all([user1, user2, user3])
+        sophiasFarm = session.query(Farmer).filter_by(userId=sophia.id).one()
+        amandasFarm = session.query(Farmer).filter_by(farmName="Amanda's Farm").one()
+        michaelsFarm = session.query(Farmer).filter_by(farmName="Michael's Farm").one()
+        sophia.farmerId = sophiasFarm.id
+        amanda.farmerId = amandasFarm.id
+        michael.farmerId = michaelsFarm.id
+        sophia.isFarmer = True
+        amanda.isFarmer = True
+        michael.isFarmer = True
+        session.add_all([sophia, amanda, michael])
         session.commit()
 
         print("Inserting categories")
@@ -90,152 +96,132 @@ def main() -> None:
         session.commit()
 
         print("Inserting sub categories")
-        vegetables = session.query(ProductCategory).filter_by(name="Vegetables").first()
-        fruits = session.query(ProductCategory).filter_by(name="Fruits").first()
+        vegetables = session.query(ProductCategory).filter_by(name="Vegetables").one()
+        fruits = session.query(ProductCategory).filter_by(name="Fruits").one()
         session.add_all([
             ProductCategory(name="Leafy", parentCategoryId=vegetables.id),
             ProductCategory(name="Root", parentCategoryId=vegetables.id),
-            ProductCategory(name="Podded", parentCategoryId=vegetables.id),
             ProductCategory(name="Citrus", parentCategoryId=fruits.id),
             ProductCategory(name="Berry", parentCategoryId=fruits.id),
-            ProductCategory(name="Melon", parentCategoryId=fruits.id),
         ])
         session.commit()
 
         print("Inserting sub sub categories")
-        leafy = session.query(ProductCategory).filter_by(name="Leafy").first()
-        root = session.query(ProductCategory).filter_by(name="Root").first()
-        podded = session.query(ProductCategory).filter_by(name="Podded").first()
-        citrus = session.query(ProductCategory).filter_by(name="Citrus").first()
-        berry = session.query(ProductCategory).filter_by(name="Berry").first()
-        melon = session.query(ProductCategory).filter_by(name="Melon").first()
+        leafy = session.query(ProductCategory).filter_by(name="Leafy").one()
+        root = session.query(ProductCategory).filter_by(name="Root").one()
+        citrus = session.query(ProductCategory).filter_by(name="Citrus").one()
+        berry = session.query(ProductCategory).filter_by(name="Berry").one()
         session.add_all([
-            ProductCategory(name="Spinach", parentCategoryId=leafy.id),
-            ProductCategory(name="Kale", parentCategoryId=leafy.id),
-            ProductCategory(name="Carrot", parentCategoryId=root.id),
-            ProductCategory(name="Beetroot", parentCategoryId=root.id),
-            ProductCategory(name="Peas", parentCategoryId=podded.id),
-            ProductCategory(name="Beans", parentCategoryId=podded.id),
-            ProductCategory(name="Orange", parentCategoryId=citrus.id),
-            ProductCategory(name="Lemon", parentCategoryId=citrus.id),
-            ProductCategory(name="Strawberry", parentCategoryId=berry.id),
-            ProductCategory(name="Blueberry", parentCategoryId=berry.id),
-            ProductCategory(name="Watermelon", parentCategoryId=melon.id),
-            ProductCategory(name="Honeydew", parentCategoryId=melon.id),
+            ProductCategory(name="Spinach", parentCategoryId=leafy.id, atributes="[{\"name\":\"only Leaves\",\"type\":\"boolean\",\"isRequired\":false},{\"name\":\"is baby\",\"type\":\"boolean\",\"isRequired\":false}]"),
+            ProductCategory(name="Kale", parentCategoryId=leafy.id, atributes="[{\"name\":\"weight in kg\",\"type\":\"number\",\"isRequired\":true},{\"name\":\"is BIO\",\"type\":\"boolean\",\"isRequired\":false}]"),
+            ProductCategory(name="Carrot", parentCategoryId=root.id, atributes="[{\"name\":\"length in cm\",\"type\":\"number\",\"isRequired\":false},{\"name\":\"is BIO\",\"type\":\"boolean\",\"isRequired\":true}]"),
+            ProductCategory(name="Beetroot", parentCategoryId=root.id, atributes="[{\"name\":\"weight in kg\",\"type\":\"number\",\"isRequired\":true},{\"name\":\"is BIO\",\"type\":\"boolean\",\"isRequired\":false}]"),
+            ProductCategory(name="Orange", parentCategoryId=citrus.id, atributes="[{\"name\":\"diameter in mm\",\"type\":\"number\",\"isRequired\":true},{\"name\":\"is BIO\",\"type\":\"boolean\",\"isRequired\":false}]"),
+            ProductCategory(name="Lemon", parentCategoryId=citrus.id, atributes="[{\"name\":\"weight in kg\",\"type\":\"number\",\"isRequired\":true},{\"name\":\"color\",\"type\":\"text\",\"isRequired\":false}]"),
+            ProductCategory(name="Strawberry", parentCategoryId=berry.id, atributes="[{\"name\":\"Country of origin\",\"type\":\"text\",\"isRequired\":true},{\"name\":\"is BIO\",\"type\":\"boolean\",\"isRequired\":false},{\"name\":\"number in package\",\"type\":\"number\",\"isRequired\":true}]"),
+            ProductCategory(name="Blueberry", parentCategoryId=berry.id, atributes="[{\"name\":\"weight in kg\",\"type\":\"number\",\"isRequired\":false}]"),
         ])
         session.commit()
 
         print("Inserting new category requests")
-        user4 = session.query(User).filter_by(name="Michael").first()
-        user5 = session.query(User).filter_by(name="James").first()
-        user6 = session.query(User).filter_by(name="Olivia").first()
         session.add_all([
-            NewCategoryRequest(newCategoryName="Pumpkin", parentCategoryId=melon.id, createdById=user4.id),
-            NewCategoryRequest(newCategoryName="Cucumber", parentCategoryId=vegetables.id, createdById=user5.id),
-            NewCategoryRequest(newCategoryName="Flower", createdById=user6.id),
+            NewCategoryRequest(newCategoryName="Cucumber", parentCategoryId=vegetables.id, createdById=sophia.id, atributes="[{\"name\":\"pickled\",\"type\":\"boolean\",\"isRequired\":false}]"),
+            NewCategoryRequest(newCategoryName="Apple", parentCategoryId=fruits.id, createdById=amanda.id, atributes="[{\"name\":\"color\",\"type\":\"text\",\"isRequired\":true}]"),
         ])
         session.commit()
 
         print("Inserting products")
         session.add_all([
-            Product(name="Spinach", imageUrl="https://plus.unsplash.com/premium_photo-1701699718915-49b72f1a4b47?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fHNwaW5hY2h8ZW58MHx8MHx8fDA%3D", unit=Unit.KILOGRAM, unitPrice=2.5, stock=100, categoryId=session.query(ProductCategory).filter_by(name="Spinach").first().id, farmerId=farmer1.id),
-            Product(name="Kale", imageUrl="https://plus.unsplash.com/premium_photo-1702286619432-740a9d5e3ff0?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8a2FsZXxlbnwwfHwwfHx8MA%3D%3D", unit=Unit.KILOGRAM, unitPrice=3.5, stock=100, categoryId=session.query(ProductCategory).filter_by(name="Kale").first().id, farmerId=farmer1.id),
-            Product(name="Carrot", imageUrl="https://images.unsplash.com/photo-1445282768818-728615cc910a?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTZ8fGNhcnJvdHxlbnwwfHwwfHx8MA%3D%3D", unit=Unit.PIECE, unitPrice=1.5, stock=100, categoryId=session.query(ProductCategory).filter_by(name="Carrot").first().id, farmerId=farmer1.id),
-            Product(name="Beetroot", imageUrl="https://images.unsplash.com/photo-1627738668643-1c166aecbf3d?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTV8fGJlZXRyb290fGVufDB8fDB8fHww", unit=Unit.PIECE, unitPrice=1.8, stock=100, categoryId=session.query(ProductCategory).filter_by(name="Beetroot").first().id, farmerId=farmer1.id),
-            Product(name="Peas", imageUrl="https://images.unsplash.com/photo-1668548205372-1becd11b5641?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8cGVhc3xlbnwwfHwwfHx8MA%3D%3D", unit=Unit.KILOGRAM, unitPrice=4.0, stock=50, categoryId=session.query(ProductCategory).filter_by(name="Peas").first().id, farmerId=farmer2.id),
-            Product(name="Beans", imageUrl="https://images.unsplash.com/photo-1506620780696-e5cb6c54524e?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTV8fGJlYW5zfGVufDB8fDB8fHww", unit=Unit.KILOGRAM, unitPrice=3.8, stock=60, categoryId=session.query(ProductCategory).filter_by(name="Beans").first().id, farmerId=farmer2.id),
-            Product(name="Orange", imageUrl="https://images.unsplash.com/photo-1517161782303-6bee363b9d9a?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8b3Jhbmdlc3xlbnwwfHwwfHx8MA%3D%3D", unit=Unit.PIECE, unitPrice=0.9, stock=200, categoryId=session.query(ProductCategory).filter_by(name="Orange").first().id, farmerId=farmer2.id),
-            Product(name="Lemon", imageUrl="https://images.unsplash.com/photo-1498060059232-54fd57716ac6?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8bGVtb25zfGVufDB8fDB8fHww", unit=Unit.PIECE, unitPrice=0.5, stock=150, categoryId=session.query(ProductCategory).filter_by(name="Lemon").first().id, farmerId=farmer2.id),
-            Product(name="Strawberry", imageUrl="https://images.unsplash.com/photo-1543528176-61b239494933?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8c3RyYXdiZXJyaWVzfGVufDB8fDB8fHww", unit=Unit.KILOGRAM, unitPrice=6.0, stock=40, categoryId=session.query(ProductCategory).filter_by(name="Strawberry").first().id, farmerId=farmer3.id),
-            Product(name="Blueberry", imageUrl="https://images.unsplash.com/photo-1498557850523-fd3d118b962e?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Ymx1ZWJlcnJpZXN8ZW58MHx8MHx8fDA%3D", unit=Unit.KILOGRAM, unitPrice=8.0, stock=30, categoryId=session.query(ProductCategory).filter_by(name="Blueberry").first().id, farmerId=farmer3.id),
-            Product(name="Watermelon", imageUrl="https://plus.unsplash.com/premium_photo-1663855531381-f9c100b3c48f?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8d2F0ZXJtZWxvbnxlbnwwfHwwfHx8MA%3D%3D", unit=Unit.PIECE, unitPrice=3.0, stock=25, categoryId=session.query(ProductCategory).filter_by(name="Watermelon").first().id, farmerId=farmer3.id),
-            Product(name="Honeydew", imageUrl="https://images.unsplash.com/photo-1623125489492-6d3641414e37?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", unit=Unit.PIECE, unitPrice=3.2, stock=20, categoryId=session.query(ProductCategory).filter_by(name="Honeydew").first().id, farmerId=farmer3.id),
+            #Sophia's products
+            Product(name="Spinach Frans Hubert", imageUrl="https://plus.unsplash.com/premium_photo-1701699718915-49b72f1a4b47?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fHNwaW5hY2h8ZW58MHx8MHx8fDA%3D", unit=Unit.KILOGRAM, unitPrice=2.5, stock=100, categoryId=session.query(ProductCategory).filter_by(name="Spinach").one().id, farmerId=sophiasFarm.id, categoryAtributes="[{\"name\":\"only Leaves\",\"value\":true},{\"name\":\"is baby\",\"value\":true}]"),
+            Product(name="Kale Marionet", imageUrl="https://plus.unsplash.com/premium_photo-1702286619432-740a9d5e3ff0?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8a2FsZXxlbnwwfHwwfHx8MA%3D%3D", unit=Unit.KILOGRAM, unitPrice=3.5, stock=100, categoryId=session.query(ProductCategory).filter_by(name="Kale").one().id, farmerId=sophiasFarm.id, categoryAtributes="[{\"name\":\"weight in kg\",\"value\":1.5},{\"name\":\"is BIO\",\"value\":true}]"),
+            Product(name="Carrot Nantes", imageUrl="https://images.unsplash.com/photo-1445282768818-728615cc910a?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTZ8fGNhcnJvdHxlbnwwfHwwfHx8MA%3D%3D", unit=Unit.PIECE, unitPrice=1.5, stock=100, categoryId=session.query(ProductCategory).filter_by(name="Carrot").one().id, farmerId=sophiasFarm.id, categoryAtributes="[{\"name\":\"length in cm\",\"value\":20},{\"name\":\"is BIO\",\"value\":true}]"),
+            Product(name="Beetroot Detroit", imageUrl="https://images.unsplash.com/photo-1627738668643-1c166aecbf3d?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTV8fGJlZXRyb290fGVufDB8fDB8fHww", unit=Unit.PIECE, unitPrice=1.8, stock=100, categoryId=session.query(ProductCategory).filter_by(name="Beetroot").one().id, farmerId=sophiasFarm.id, categoryAtributes="[{\"name\":\"weight in kg\",\"value\":0.5},{\"name\":\"is BIO\",\"value\":false}]"),
+            Product(name="Orange Jazz", imageUrl="https://images.unsplash.com/photo-1517161782303-6bee363b9d9a?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8b3Jhbmdlc3xlbnwwfHwwfHx8MA%3D%3D", unit=Unit.PIECE, unitPrice=0.9, stock=200, categoryId=session.query(ProductCategory).filter_by(name="Orange").one().id, farmerId=sophiasFarm.id, categoryAtributes="[{\"name\":\"diameter in mm\",\"value\":80},{\"name\":\"is BIO\",\"value\":false}]"),
+            Product(name="Lemon Elton", imageUrl="https://images.unsplash.com/photo-1498060059232-54fd57716ac6?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8bGVtb25zfGVufDB8fDB8fHww", unit=Unit.PIECE, unitPrice=0.5, stock=150, categoryId=session.query(ProductCategory).filter_by(name="Lemon").one().id, farmerId=sophiasFarm.id, categoryAtributes="[{\"name\":\"weight in kg\",\"value\":0.1},{\"name\":\"color\",\"value\":\"yellow\"}]"),
+            Product(name="Strawberry Sweet Charlie", imageUrl="https://images.unsplash.com/photo-1543528176-61b239494933?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8c3RyYXdiZXJyaWVzfGVufDB8fDB8fHww", unit=Unit.KILOGRAM, unitPrice=6.0, stock=40, categoryId=session.query(ProductCategory).filter_by(name="Strawberry").one().id, farmerId=sophiasFarm.id, categoryAtributes="[{\"name\":\"Country of origin\",\"value\":\"Czech Republic\"},{\"name\":\"is BIO\",\"value\":false},{\"name\":\"number in package\",\"value\":250}]"),
+            Product(name="Blueberry Bluecrop", imageUrl="https://images.unsplash.com/photo-1498557850523-fd3d118b962e?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Ymx1ZWJlcnJpZXN8ZW58MHx8MHx8fDA%3D", unit=Unit.KILOGRAM, unitPrice=8.0, stock=30, categoryId=session.query(ProductCategory).filter_by(name="Blueberry").one().id, farmerId=sophiasFarm.id, categoryAtributes="[{\"name\":\"weight in kg\",\"value\":0.25}]"),
+            #Amanda's products with different atributes
+            Product(name="Spanish Spinach", imageUrl="https://plus.unsplash.com/premium_photo-1701699718915-49b72f1a4b47?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fHNwaW5hY2h8ZW58MHx8MHx8fDA%3D", unit=Unit.KILOGRAM, unitPrice=2.7, stock=100, categoryId=session.query(ProductCategory).filter_by(name="Spinach").one().id, farmerId=amandasFarm.id, categoryAtributes="[{\"name\":\"only Leaves\",\"value\":false},{\"name\":\"is baby\",\"value\":true}]"),
+            Product(name="Glorious Kale", imageUrl="https://plus.unsplash.com/premium_photo-1702286619432-740a9d5e3ff0?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8a2FsZXxlbnwwfHwwfHx8MA%3D%3D", unit=Unit.KILOGRAM,  unitPrice=3.8, stock=100, categoryId=session.query(ProductCategory).filter_by(name="Kale").one().id, farmerId=amandasFarm.id, categoryAtributes="[{\"name\":\"weight in kg\",\"value\":1.2},{\"name\":\"is BIO\",\"value\":true}]"),
+            Product(name="Cute Carrot", imageUrl="https://images.unsplash.com/photo-1445282768818-728615cc910a?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTZ8fGNhcnJvdHxlbnwwfHwwfHx8MA%3D%3D", unit=Unit.PIECE, unitPrice=1.6, stock=100, categoryId=session.query(ProductCategory).filter_by(name="Carrot").one().id, farmerId=amandasFarm.id, categoryAtributes="[{\"name\":\"length in cm\",\"value\":18},{\"name\":\"is BIO\",\"value\":false}]"),
+            Product(name="Beige Beetroot", imageUrl="https://images.unsplash.com/photo-1627738668643-1c166aecbf3d?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTV8fGJlZXRyb290fGVufDB8fDB8fHww", unit=Unit.PIECE, unitPrice=2.0, stock=100, categoryId=session.query(ProductCategory).filter_by(name="Beetroot").one().id, farmerId=amandasFarm.id, categoryAtributes="[{\"name\":\"weight in kg\",\"value\":0.6},{\"name\":\"is BIO\",\"value\":false}]"),      
+            Product(name="Omnious Orange", imageUrl="https://images.unsplash.com/photo-1517161782303-6bee363b9d9a?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8b3Jhbmdlc3xlbnwwfHwwfHx8MA%3D%3D", unit=Unit.PIECE, unitPrice=1.0, stock=200, categoryId=session.query(ProductCategory).filter_by(name="Orange").one().id, farmerId=amandasFarm.id, categoryAtributes="[{\"name\":\"diameter in mm\",\"value\":85},{\"name\":\"is BIO\",\"value\":true}]"),   
+            Product(name="Lazy Lemon", imageUrl="https://images.unsplash.com/photo-1498060059232-54fd57716ac6?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8bGVtb25zfGVufDB8fDB8fHww", unit=Unit.PIECE, unitPrice=0.6, stock=150, categoryId=session.query(ProductCategory).filter_by(name="Lemon").one().id, farmerId=amandasFarm.id, categoryAtributes="[{\"name\":\"weight in kg\",\"value\":0.12},{\"name\":\"color\",\"value\":\"bright yellow\"}]"),
+            Product(name="Sweet Strawberry", imageUrl="https://images.unsplash.com/photo-1543528176-61b239494933?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8c3RyYXdiZXJyaWVzfGVufDB8fDB8fHww", unit=Unit.KILOGRAM, unitPrice=6.5, stock=40, categoryId=session.query(ProductCategory).filter_by(name="Strawberry").one().id, farmerId=amandasFarm.id, categoryAtributes="[{\"name\":\"Country of origin\",\"value\":\"France\"},{\"name\":\"is BIO\",\"value\":true},{\"name\":\"number in package\",\"value\":300}]"),
+            Product(name="Barbarous Blueberry", imageUrl="https://images.unsplash.com/photo-1498557850523-fd3d118b962e?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Ymx1ZWJlcnJpZXN8ZW58MHx8MHx8fDA%3D", unit=Unit.KILOGRAM, unitPrice=7.8, stock=30, categoryId=session.query(ProductCategory).filter_by(name="Blueberry").one().id, farmerId=amandasFarm.id, categoryAtributes="[{\"name\":\"weight in kg\",\"value\":0.3}]"),
+            #Michael's products
+            Product(name="Spinach", imageUrl="https://plus.unsplash.com/premium_photo-1701699718915-49b72f1a4b47?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fHNwaW5hY2h8ZW58MHx8MHx8fDA%3D", unit=Unit.KILOGRAM, unitPrice=2.7, stock=100, categoryId=session.query(ProductCategory).filter_by(name="Spinach").one().id, farmerId=michaelsFarm.id, categoryAtributes="[{\"name\":\"only Leaves\",\"value\":false},{\"name\":\"is baby\",\"value\":false}]"),
+            Product(name="Kale", imageUrl="https://plus.unsplash.com/premium_photo-1702286619432-740a9d5e3ff0?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8a2FsZXxlbnwwfHwwfHx8MA%3D%3D", unit=Unit.KILOGRAM,  unitPrice=3.8, stock=100, categoryId=session.query(ProductCategory).filter_by(name="Kale").one().id, farmerId=michaelsFarm.id, categoryAtributes="[{\"name\":\"weight in kg\",\"value\":2.2},{\"name\":\"is BIO\",\"value\":true}]"),
+            Product(name="Carrot", imageUrl="https://images.unsplash.com/photo-1445282768818-728615cc910a?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTZ8fGNhcnJvdHxlbnwwfHwwfHx8MA%3D%3D", unit=Unit.PIECE, unitPrice=1.6, stock=100, categoryId=session.query(ProductCategory).filter_by(name="Carrot").one().id, farmerId=michaelsFarm.id, categoryAtributes="[{\"name\":\"length in cm\",\"value\":15},{\"name\":\"is BIO\",\"value\":true}]"),
+            Product(name="Beetroot", imageUrl="https://images.unsplash.com/photo-1627738668643-1c166aecbf3d?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTV8fGJlZXRyb290fGVufDB8fDB8fHww", unit=Unit.PIECE, unitPrice=2.0, stock=100, categoryId=session.query(ProductCategory).filter_by(name="Beetroot").one().id, farmerId=michaelsFarm.id, categoryAtributes="[{\"name\":\"weight in kg\",\"value\":0.5},{\"name\":\"is BIO\",\"value\":true}]"),      
+            Product(name="Orange", imageUrl="https://images.unsplash.com/photo-1517161782303-6bee363b9d9a?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8b3Jhbmdlc3xlbnwwfHwwfHx8MA%3D%3D", unit=Unit.PIECE, unitPrice=1.0, stock=200, categoryId=session.query(ProductCategory).filter_by(name="Orange").one().id, farmerId=michaelsFarm.id, categoryAtributes="[{\"name\":\"diameter in mm\",\"value\":81},{\"name\":\"is BIO\",\"value\":true}]"),   
+            Product(name="Lemon", imageUrl="https://images.unsplash.com/photo-1498060059232-54fd57716ac6?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8bGVtb25zfGVufDB8fDB8fHww", unit=Unit.PIECE, unitPrice=0.6, stock=150, categoryId=session.query(ProductCategory).filter_by(name="Lemon").one().id, farmerId=michaelsFarm.id, categoryAtributes="[{\"name\":\"weight in kg\",\"value\":0.22},{\"name\":\"color\",\"value\":\"yellow\"}]"),
+            Product(name="Strawberry", imageUrl="https://images.unsplash.com/photo-1543528176-61b239494933?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8c3RyYXdiZXJyaWVzfGVufDB8fDB8fHww", unit=Unit.KILOGRAM, unitPrice=6.5, stock=40, categoryId=session.query(ProductCategory).filter_by(name="Strawberry").one().id, farmerId=michaelsFarm.id, categoryAtributes="[{\"name\":\"Country of origin\",\"value\":\"France\"},{\"name\":\"is BIO\",\"value\":false},{\"name\":\"number in package\",\"value\":200}]"),
+            Product(name="Blueberry", imageUrl="https://images.unsplash.com/photo-1498557850523-fd3d118b962e?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Ymx1ZWJlcnJpZXN8ZW58MHx8MHx8fDA%3D", unit=Unit.KILOGRAM, unitPrice=7.8, stock=30, categoryId=session.query(ProductCategory).filter_by(name="Blueberry").one().id, farmerId=michaelsFarm.id, categoryAtributes="[{\"name\":\"weight in kg\",\"value\":0.7}]"),
+            
         ])
         session.commit()
 
         print("Inserting orders")
-        user1 = session.query(User).filter_by(name="James").first()
-        user2 = session.query(User).filter_by(name="Olivia").first()
-        user3 = session.query(User).filter_by(name="Michael").first()
-        farmer1 = session.query(Farmer).filter_by(farmName="John's Farm").first()
-        farmer2 = session.query(Farmer).filter_by(farmName="Emma's Farm").first()
+        james = session.query(User).filter_by(email="jb@gmail.com").one()
         session.add_all([
-            Order(orderNumber="ORD-001", userId=user1.id, farmerId=farmer1.id, createdAt=datetime.timestamp(datetime.strptime("2021-10-01 10:00", "%Y-%m-%d %H:%M")), status="ACCEPTED"),
-            Order(orderNumber="ORD-002", userId=user2.id, farmerId=farmer2.id, createdAt=datetime.timestamp(datetime.strptime("2024-10-02 12:30", "%Y-%m-%d %H:%M")), status="ACCEPTED"),
-            Order(orderNumber="ORD-003", userId=user3.id, farmerId=farmer1.id, createdAt=datetime.timestamp(datetime.strptime("2024-10-03 12:30", "%Y-%m-%d %H:%M")), status="ACCEPTED"),
-            Order(orderNumber="ORD-004", userId=user1.id, farmerId=farmer2.id, createdAt=datetime.timestamp(datetime.strptime("2024-10-04 12:30", "%Y-%m-%d %H:%M")), status="ACCEPTED"),
+            Order(orderNumber="ORD-001", userId=james.id, farmerId=sophiasFarm.id, createdAt=datetime.timestamp(datetime.strptime("2021-10-01 10:00", "%Y-%m-%d %H:%M")), status="SUPPLIED"),
+            Order(orderNumber="ORD-002", userId=james.id, farmerId=sophiasFarm.id, createdAt=datetime.timestamp(datetime.strptime("2024-10-02 12:30", "%Y-%m-%d %H:%M")), status="SUPPLIED"),
+            Order(orderNumber="ORD-003", userId=james.id, farmerId=amandasFarm.id, createdAt=datetime.timestamp(datetime.strptime("2024-10-03 12:30", "%Y-%m-%d %H:%M")), status="IN_CART"),
         ])
         session.commit()
 
         print("Inserting order product relations")
-        order1 = session.query(Order).filter_by(orderNumber="ORD-001").first()
-        order2 = session.query(Order).filter_by(orderNumber="ORD-002").first()
-        order3 = session.query(Order).filter_by(orderNumber="ORD-003").first()
-        order4 = session.query(Order).filter_by(orderNumber="ORD-004").first()
-        product1 = session.query(Product).filter_by(name="Spinach").first()
-        product2 = session.query(Product).filter_by(name="Kale").first()
-        product3 = session.query(Product).filter_by(name="Carrot").first()
-        product4 = session.query(Product).filter_by(name="Beetroot").first()
-        product5 = session.query(Product).filter_by(name="Peas").first()
-        product6 = session.query(Product).filter_by(name="Beans").first()
-        product7 = session.query(Product).filter_by(name="Orange").first()
-        product8 = session.query(Product).filter_by(name="Lemon").first()
-        product9 = session.query(Product).filter_by(name="Strawberry").first()
-        product10 = session.query(Product).filter_by(name="Blueberry").first()
+        order1 = session.query(Order).filter_by(orderNumber="ORD-001").one()
+        order2 = session.query(Order).filter_by(orderNumber="ORD-002").one()
+        order3 = session.query(Order).filter_by(orderNumber="ORD-003").one()
+        sophiasOranges = session.query(Product).filter_by(name="Orange Jazz").one()
+        sophiasStrawberries = session.query(Product).filter_by(name="Strawberry Sweet Charlie").one()
+        sophiasLemons = session.query(Product).filter_by(name="Lemon Elton").one()
+        amandasSpinach = session.query(Product).filter_by(name="Spanish Spinach").one()
+        amandasKale = session.query(Product).filter_by(name="Glorious Kale").one()
         session.add_all([
-            OrderProductRelation(orderId=order1.id, productId=product1.id, quantity=2),
-            OrderProductRelation(orderId=order1.id, productId=product2.id, quantity=1),
-            OrderProductRelation(orderId=order2.id, productId=product3.id, quantity=3),
-            OrderProductRelation(orderId=order2.id, productId=product4.id, quantity=2),
-            OrderProductRelation(orderId=order3.id, productId=product5.id, quantity=1),
-            OrderProductRelation(orderId=order3.id, productId=product6.id, quantity=2),
-            OrderProductRelation(orderId=order4.id, productId=product7.id, quantity=3),
-            OrderProductRelation(orderId=order4.id, productId=product8.id, quantity=2),
-            OrderProductRelation(orderId=order4.id, productId=product9.id, quantity=1),
-            OrderProductRelation(orderId=order4.id, productId=product10.id, quantity=2),
+            # Order 1
+            OrderProductRelation(orderId=order1.id, productId=sophiasOranges.id, quantity=2),
+            OrderProductRelation(orderId=order1.id, productId=sophiasStrawberries.id, quantity=1),
+            OrderProductRelation(orderId=order1.id, productId=sophiasLemons.id, quantity=3),
+            # Order 2
+            OrderProductRelation(orderId=order2.id, productId=sophiasOranges.id, quantity=3),
+            OrderProductRelation(orderId=order2.id, productId=sophiasStrawberries.id, quantity=2),
+            OrderProductRelation(orderId=order2.id, productId=sophiasLemons.id, quantity=4),
+            # Order 3
+            OrderProductRelation(orderId=order3.id, productId=amandasSpinach.id, quantity=2),
+            OrderProductRelation(orderId=order3.id, productId=amandasKale.id, quantity=3),
+
         ])
         session.commit()
 
         print("Inserting events")
-        farmer1 = session.query(Farmer).filter_by(farmName="John's Farm").first()
-        farmer2 = session.query(Farmer).filter_by(farmName="Emma's Farm").first()
-        farmer3 = session.query(Farmer).filter_by(farmName="Sophia's Farm").first()
         session.add_all([
-            Event(name="Old Farmers Market", description="Join us at the farmers market to buy fresh produce directly from the farmers.", startDate=datetime.timestamp(datetime.strptime("2024-10-01 12:30", "%Y-%m-%d %H:%M")), endDate=datetime.timestamp(datetime.strptime("2024-10-03 20:00", "%Y-%m-%d %H:%M")), createdById=farmer1.id, createdAt=datetime.timestamp(datetime.strptime("2024-09-01 11:00", "%Y-%m-%d %H:%M")), state="Slovenská republika", city="Bratislava", street="Vajnorská", streetNumber="100", zipCode="831 04"),
-            Event(name="New Farmers Market", description="Join us at the farmers market to buy fresh produce directly from the farmers.", startDate=datetime.timestamp(datetime.strptime("2024-12-01 12:30", "%Y-%m-%d %H:%M")), endDate=datetime.timestamp(datetime.strptime("2024-12-03 20:00", "%Y-%m-%d %H:%M")), createdById=farmer2.id, createdAt=datetime.timestamp(datetime.strptime("2024-09-01 11:00", "%Y-%m-%d %H:%M")), state="Slovenská republika", city="Košice", street="Orlia", streetNumber="1", zipCode="040 01"),
-            Event(name="Green Market", description="Join us at the farmers market to buy fresh produce directly from the farmers.", startDate=datetime.timestamp(datetime.strptime("2025-10-01 12:30", "%Y-%m-%d %H:%M")), endDate=datetime.timestamp(datetime.strptime("2025-10-03 20:00", "%Y-%m-%d %H:%M")), createdById=farmer3.id, createdAt=datetime.timestamp(datetime.strptime("2025-09-01 11:00", "%Y-%m-%d %H:%M")), state="Česká republika", city="Brno", street="Haškova", streetNumber="1", zipCode="602 00"),
+            Event(name="Old Farmers Market", description="Join us at the farmers market to buy fresh produce directly from the farmers.", startDate=datetime.timestamp(datetime.strptime("2024-10-01 12:30", "%Y-%m-%d %H:%M")), endDate=datetime.timestamp(datetime.strptime("2024-10-03 20:00", "%Y-%m-%d %H:%M")), createdById=sophiasFarm.id, createdAt=datetime.timestamp(datetime.strptime("2024-09-01 11:00", "%Y-%m-%d %H:%M")), state="Slovenská republika", city="Bratislava", street="Vajnorská", streetNumber="100", zipCode="831 04"),
+            Event(name="New Farmers Market", description="Join us at the farmers market to buy fresh produce directly from the farmers.", startDate=datetime.timestamp(datetime.strptime("2024-12-01 12:30", "%Y-%m-%d %H:%M")), endDate=datetime.timestamp(datetime.strptime("2024-12-03 20:00", "%Y-%m-%d %H:%M")), createdById=amandasFarm.id, createdAt=datetime.timestamp(datetime.strptime("2024-09-01 11:00", "%Y-%m-%d %H:%M")), state="Slovenská republika", city="Košice", street="Orlia", streetNumber="1", zipCode="040 01"),
+            Event(name="Green Market", description="Join us at the farmers market to buy fresh produce directly from the farmers.", startDate=datetime.timestamp(datetime.strptime("2025-10-01 12:30", "%Y-%m-%d %H:%M")), endDate=datetime.timestamp(datetime.strptime("2025-10-03 20:00", "%Y-%m-%d %H:%M")), createdById=michaelsFarm.id, createdAt=datetime.timestamp(datetime.strptime("2025-09-01 11:00", "%Y-%m-%d %H:%M")), state="Česká republika", city="Brno", street="Haškova", streetNumber="1", zipCode="602 00"),
         ])
         session.commit()
 
-        print("Inserting user event relations")
-        user1 = session.query(User).filter_by(name="James").first()
-        user2 = session.query(User).filter_by(name="Olivia").first()
-        user3 = session.query(User).filter_by(name="Michael").first()
-        event1 = session.query(Event).filter_by(name="Old Farmers Market").first()
-        event2 = session.query(Event).filter_by(name="New Farmers Market").first()
-        event3 = session.query(Event).filter_by(name="Green Market").first()
+        print("Inserting user event relations")        
+        event1 = session.query(Event).filter_by(name="Old Farmers Market").one()
+        event2 = session.query(Event).filter_by(name="New Farmers Market").one()
         session.add_all([
-            UserEventRelation(userId=user1.id, eventId=event1.id),
-            UserEventRelation(userId=user2.id, eventId=event2.id),
-            UserEventRelation(userId=user3.id, eventId=event3.id),
-            UserEventRelation(userId=user1.id, eventId=event2.id),
-            UserEventRelation(userId=user1.id, eventId=event3.id),
+            UserEventRelation(userId=james.id, eventId=event1.id),
+            UserEventRelation(userId=james.id, eventId=event2.id),
         ])
         session.commit()
         
         print("Inserting reviews")
-        user1 = session.query(User).filter_by(name="James").first()
-        order1 = session.query(Order).filter_by(orderNumber="ORD-001").first()
-        product1 = session.query(Product).filter_by(name="Spinach").first()
-        product2 = session.query(Product).filter_by(name="Kale").first()
-        order4 = session.query(Order).filter_by(orderNumber="ORD-004").first()
-        product3 = session.query(Product).filter_by(name="Orange").first()
-        product4 = session.query(Product).filter_by(name="Lemon").first()
         session.add_all([
-            Review(userId=user1.id, orderId=order1.id, productId=product1.id, rating=5, createdAt="2021-10-01 11:00"),
-            Review(userId=user1.id, orderId=order1.id, productId=product2.id, rating=4, createdAt="2021-10-01 11:00"),
-            Review(userId=user1.id, orderId=order4.id, productId=product3.id, rating=2, createdAt="2021-10-01 11:00"),
-            Review(userId=user1.id, orderId=order4.id, productId=product4.id, rating=1, createdAt="2021-10-01 11:00"),
+            Review(userId=james.id, orderId=order1.id, productId=sophiasOranges.id, rating=5, createdAt=datetime.timestamp(datetime.strptime("2021-10-01 11:00", "%Y-%m-%d %H:%M"))),
+            Review(userId=james.id, orderId=order1.id, productId=sophiasStrawberries.id, rating=4, createdAt=datetime.timestamp(datetime.strptime("2021-10-01 11:00", "%Y-%m-%d %H:%M"))),
+            Review(userId=james.id, orderId=order1.id, productId=sophiasLemons.id, rating=4, createdAt=datetime.timestamp(datetime.strptime("2021-10-01 11:00", "%Y-%m-%d %H:%M"))),
+            Review(userId=james.id, orderId=order2.id, productId=sophiasOranges.id, rating=2, createdAt=datetime.timestamp(datetime.strptime("2024-10-02 13:00", "%Y-%m-%d %H:%M"))),
+            Review(userId=james.id, orderId=order2.id, productId=sophiasStrawberries.id, rating=1, createdAt=datetime.timestamp(datetime.strptime("2024-10-02 13:00", "%Y-%m-%d %H:%M"))),
+            Review(userId=james.id, orderId=order2.id, productId=sophiasLemons.id, rating=3, createdAt=datetime.timestamp(datetime.strptime("2024-10-02 13:00", "%Y-%m-%d %H:%M"))),
         ])
         session.commit()
         
