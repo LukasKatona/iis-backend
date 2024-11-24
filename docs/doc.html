@@ -76,11 +76,9 @@
 
 		<dt>URL aplikace</dt>
 		<dd><a href="http://www.stud.fit.vutbr.cz/~xkaton00/IIS/">http://www.stud.fit.vutbr.cz/~xkaton00/IIS/</a></dd>
-		<dd>(pokud má aplikace více vstupních stránek, napište obdobně další URL)</dd>
 	</dl>
 
 	<h2>Uživatelé systému pro testování</h2>
-	<p>Uveďte prosím existující zástupce <strong>všech rolí uživatelů</strong>.</p>
 	<table>
 		<tr>
 			<th>Login</th>
@@ -116,9 +114,7 @@
 
 	<h3>Video</h3>
 
-	<p>Přiložte odkaz na komentované video demostrující použití informačního systému. Zaměřte se na případy užití
-		definované zadáním (např. registrace uživatele, správa uživatelů a činnosti jednotlivých rolí). Video nahrajte
-		například na VUT Google Drive, kde ho bude možné přímo spustit z odkazu.</p>
+	<a href="https://drive.google.com/file/d/1OhnHDGARjfHmKQKbwcHMdtlZW4jDkpMT/view?usp=sharing">https://drive.google.com/e-farm-video</a></href>
 
 	<h2>Implementace</h2>
 
@@ -156,11 +152,11 @@
 		<li>GET /users/user_id</li>
 		<ul>
 			<li>Práva: všichni</li>
-			<li>Použití: banner informací o farmáři,</li>
+			<li>Použití: banner informací o farmáři</li>
 		</ul>
-		<li>POST /users</li> <!-- ?? -->
+		<li>POST /users</li>
 		<ul>
-			<li>Práva: administrátor</li>
+			<li>Práva: všichni</li>
 			<li>Použití: vytvoření nového uživatele</li>
 		</ul>
 		<li>PATCH /users/user_id</li>
@@ -171,7 +167,7 @@
 		<li>PATCH /users/user_id/password</li>
 		<ul>
 			<li>Práva: administrátor, přihlíšený uživatel (pouze své heslo)</li>
-			<li>Použití: formulář změny hesla</li>
+			<li>Použití: není implementováno na FE</li>
 		</ul>
 		<li>DELETE /users/user_id</li>
 		<ul>
@@ -200,18 +196,18 @@
 		</ul>
 		<li>POST /farmers</li>
 		<ul>
-			<li>Práva: farmář který je akutuálně přihlášený uživatel, administrátor</li>
+			<li>Práva: akutuálně přihlášený uživatel, administrátor</li>
 			<li>Použití: vytvoření nového farmáře</li>
 		</ul>
 		<li>PATCH /farmers/farmer_id</li>
 		<ul>
-			<li>Práva: farmář který je akutuálně přihlášený uživatel</li>
-			<li>Použití: úprava vlastního profilu</li>
+			<li>Práva: farmář který je akutuálně přihlášený, administrátor</li>
+			<li>Použití: úprava vlastního profilu, administrativní stránka</li>
 		</ul>
 		<li>DELETE /farmers/farmer_id</li>
 		<ul>
 			<li>Práva: administrátor</li>
-			<li>Použití: smazání vlastního profilu</li>
+			<li>Použití: smazání farmáře na sdministrativní stránce</li>
 		</ul>
 	</ul>
 
@@ -284,7 +280,7 @@
 		<li>DELETE /orders/order_id</li>
 		<ul>
 			<li>Práva: přihlášený uživatel</li>
-			<li>Použití: smazání produktu z košíku</li>
+			<li>Použití: smazání objednávky z košíku</li>
 		</ul>
 		<li>DELETE /orders/order_id/product/product_id</li>
 		<ul>
@@ -321,13 +317,13 @@
 	<ul>
 		<li>GET /events</li>
 		<ul>
-			<li>Práva: všichni</li>
-			<li>Použití: přehled všech událostí na stránce</li>
+			<li>Práva: přihlášený uživatel</li>
+			<li>Použití: přehled všech událostí</li>
 		</ul>
-		<li>GET /events/user_id</li> <!-- ?? -->
+		<li>GET /events/user_id</li>
 		<ul>
 			<li>Práva: přihlášený uživatel</li>
-			<li>Použití: přehled událostí konrténího farmáře</li>
+			<li>Použití: přehled událostí přidaných mezi oblíbené daného uživatele</li>
 		</ul>
 		<li>POST /events</li>
 		<ul>
@@ -376,7 +372,7 @@
 		<li>DELETE /reviews/review_id</li>
 		<ul>
 			<li>Práva: přihlášený uživatel</li>
-			<li>Použití: smazání vlastní recenze</li>
+			<li>Použití: není implementováno na FE</li>
 		</ul>
 	</ul>
 
@@ -400,7 +396,7 @@
 		<li>DELETE /category-requests/category_id</li>
 		<ul>
 			<li>Práva: administrátor, moderátor</li>
-			<li>Použití: smazání návrhu kategorie</li>
+			<li>Použití: není implementováno na FE</li>
 		</ul>
 	</ul>
 
@@ -502,8 +498,17 @@
 
 		<h2>Známé problémy</h2>
 		<p>
-			SSl connectino error.
+			No 'Access-Control-Allow-Origin' header is present on the requested resource. 
+			<ul>
+				<li>Problém se objevuje pouze jednou za čas, podle nás máme však CORS správně nastavený a proto jsme nebyly schopni tento problém vyřešit.</li>
+				<li>Stačí stránku načíst znovu a akci/požadavek opakovat.</li>
+			</ul> 
+			Editace hesla
+			<ul>
+				<li>Není dokončena změna hesla.</li>
+			</ul>
 		</p>
+		
 
 </body>
 
